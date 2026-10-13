@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AZIMA. Демо нұсқа</title>
+<meta name="author" content="Муса Ташмуканов">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Lilita+One&family=Neucha&family=Nunito:wght@500;700;800&display=swap">
+<style>
+:root{--disp:"Neucha"}
+[lang="kk"]{--disp:"Comfortaa"}
+:root{
+  --paper:#FCFDF8; --line:#CFE3F1; --ink:#26348F; --margin:#E0425A;
+  --card:#FFFFFF; --ok:#23794A; --no:#C92A41; --star:#F0A91B; --soft:#EEF2FF;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1E3A2F; --line:#2A4A3D; --ink:#F1F3E8; --margin:#E7C65B;
+    --card:#24463A; --ok:#8FE0A8; --no:#FF9AA5; --star:#FFD25E; --soft:#2C5244;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1E3A2F; --line:#2A4A3D; --ink:#F1F3E8; --margin:#E7C65B;
+  --card:#24463A; --ok:#8FE0A8; --no:#FF9AA5; --star:#FFD25E; --soft:#2C5244;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; min-height:100%; color:var(--ink);
+  font-family:"Nunito","Trebuchet MS",Verdana,sans-serif; font-weight:500; font-size:1.125rem; line-height:1.45;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+body::before{content:"";position:fixed;top:0;bottom:0;left:max(14px,4vw);width:2px;background:var(--margin);opacity:.7;pointer-events:none}
+#app{max-width:44rem;margin:0 auto;padding:1.5rem 1rem 3rem max(2rem,7vw)}
+h1,h2,.hand{font-family:var(--disp),"Comic Sans MS","Segoe Print",cursive;font-weight:400;line-height:1.1;margin:0}
+h1{font-size:clamp(2.2rem,8vw,3.4rem)}
+h2{font-size:clamp(1.7rem,6vw,2.3rem)}
+p{margin:.5rem 0 1rem;max-width:34rem}
+button,input{font:inherit;color:inherit}
+.btn{
+  background:var(--card);border:2.5px solid var(--ink);border-radius:14px;
+  box-shadow:0 4px 0 var(--ink);padding:.7rem 1rem;cursor:pointer;font-weight:700;
+  transition:transform .08s, box-shadow .08s;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn:focus-visible,input:focus-visible{outline:3px solid var(--margin);outline-offset:3px}
+.btn[disabled]{opacity:.45;cursor:default;box-shadow:none;transform:none}
+.btn.plain{box-shadow:none;border-width:2px;font-weight:700;padding:.45rem .8rem}
+.btn.main{background:var(--ink);color:var(--paper)}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.sp{justify-content:space-between}
+
+/* выбор героя */
+.heroes{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.9rem;margin:1.2rem 0 1.6rem}
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.1rem;padding:1rem .6rem}
+.hero .em{font-size:3rem;line-height:1.1}
+.hero .nm{font-family:var(--disp),"Comic Sans MS",cursive;font-size:1.6rem}
+.hero .rl{font-size:.95rem;font-weight:500}
+.own{background:var(--soft);border:2px dashed var(--ink);border-radius:16px;padding:1rem}
+.own input{width:100%;max-width:18rem;padding:.6rem .8rem;border:2.5px solid var(--ink);border-radius:12px;background:var(--card);font-weight:700}
+.pick{display:flex;gap:.4rem;flex-wrap:wrap;margin:.8rem 0}
+.pick button{font-size:1.6rem;width:3rem;height:3rem;padding:0;line-height:1}
+.pick button[aria-pressed="true"]{background:var(--ink)}
+
+/* темы */
+.topics{list-style:none;padding:0;margin:1.2rem 0;display:grid;gap:.8rem;counter-reset:t}
+.topic{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:.9rem;align-items:center;text-align:left}
+.topic::before{counter-increment:t;content:counter(t);font-family:var(--disp),cursive;font-size:2rem;width:2.6rem;height:2.6rem;display:grid;place-items:center;border:2px solid var(--margin);border-radius:50%;color:var(--margin)}
+.topic small{display:block;font-weight:500;font-size:.95rem}
+.stars{color:var(--star);letter-spacing:.08em;font-size:1.25rem;white-space:nowrap}
+.stars i{font-style:normal;color:var(--ink);opacity:.25}
+
+/* задание */
+.steps{display:flex;gap:.4rem}
+.steps span{width:1.1rem;height:1.1rem;border-radius:50%;border:2px solid var(--ink)}
+.steps .done{background:var(--star)} .steps .miss{background:var(--line)} .steps .now{background:var(--ink)}
+.say{display:grid;grid-template-columns:auto 1fr;gap:.8rem;align-items:start;margin:1.2rem 0}
+.say .em{font-size:3.2rem;line-height:1}
+.bubble{background:var(--card);border:2.5px solid var(--ink);border-radius:4px 18px 18px 18px;padding:.8rem 1rem;font-size:1.25rem;font-weight:700}
+.big{font-family:var(--disp),"Comic Sans MS",cursive;font-size:clamp(3rem,13vw,4.6rem);text-align:center;margin:1rem 0;line-height:1.15;display:flex;gap:.35em;justify-content:center;flex-wrap:wrap;align-items:center}
+.big.pics{font-size:clamp(2rem,9vw,2.8rem);gap:.25em}
+.q{display:inline-grid;place-items:center;min-width:1.25em;height:1.25em;border:3px dashed var(--margin);border-radius:12px;color:var(--margin);padding:0 .1em}
+.q.got{border-style:solid;border-color:var(--ok);color:var(--ok)}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
+.opts.three{grid-template-columns:repeat(3,1fr)}
+.opts .btn{font-family:var(--disp),"Comic Sans MS",cursive;font-size:2.2rem;padding:.5rem .2rem;min-height:4.2rem}
+.opts .btn small{display:block;font-family:"Nunito",sans-serif;font-size:.85rem;font-weight:700}
+.opts .ok{background:var(--ok);border-color:var(--ok);color:var(--paper);box-shadow:none;opacity:1}
+.opts .no{border-color:var(--no);color:var(--no);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (prefers-reduced-motion: reduce){.opts .no{animation:none}.btn{transition:none}}
+@media (max-width:26rem){.opts{grid-template-columns:repeat(2,1fr)}.opts.three{grid-template-columns:repeat(3,1fr)}}
+.opts.words{grid-template-columns:repeat(2,1fr)}
+.opts.words .btn{font-size:1.5rem}
+.note{min-height:5.5rem;margin-top:1.1rem}
+.hint{background:var(--soft);border-left:4px solid var(--margin);border-radius:0 12px 12px 0;padding:.7rem 1rem}
+.good{font-family:var(--disp),cursive;font-size:1.9rem;color:var(--ok);text-align:center}
+.dots{display:flex;flex-wrap:wrap;gap:6px;margin:.5rem 0}
+.dot{width:22px;height:22px;border-radius:50%;background:var(--ink);border:2px solid var(--ink);flex:none}
+.dot:nth-child(5n){margin-right:12px}
+.dot.b{background:var(--margin);border-color:var(--margin)}
+.dot.e{background:transparent;border-style:dashed}
+.dot.x{background:linear-gradient(45deg,transparent 44%,var(--no) 44%,var(--no) 56%,transparent 56%);border-color:var(--no);opacity:.8}
+.vis{background:var(--card);border:2px dashed var(--ink);border-radius:16px;padding:1rem;margin:1rem 0;min-height:8rem}
+.vis .dots{justify-content:center}
+.vis p{margin:.4rem auto;text-align:center}
+.ex{font-family:var(--disp),"Comic Sans MS",cursive;font-size:clamp(2rem,8vw,2.8rem);text-align:center;line-height:1.2;margin:.3rem 0}
+.cnt{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;font-size:2rem;line-height:1.1}
+.cnt span{display:grid;justify-items:center}
+.cnt b{font-family:var(--disp),"Comic Sans MS",cursive;font-size:1.5rem;font-weight:400}
+.nums{display:grid;grid-template-columns:repeat(auto-fill,minmax(3.6rem,1fr));gap:.5rem;margin:.5rem 0 1.4rem}
+.nums .btn{padding:.35rem 0;font-family:var(--disp),"Comic Sans MS",cursive;font-size:1.25rem;box-shadow:0 3px 0 var(--ink)}
+.nums .solved{background:var(--ok);border-color:var(--ok);color:var(--paper);box-shadow:none}
+.sect{font-family:var(--disp),"Comic Sans MS",cursive;font-size:1.5rem;margin:0}
+.wide{width:100%;text-align:left}
+.vis.seq>*{opacity:0;transition:opacity .6s}
+.vis.seq>.on{opacity:1}
+@media (prefers-reduced-motion: reduce){.vis.seq>*{transition:none}}
+.final{text-align:center;padding-top:1rem}
+.final .em{font-size:5rem;line-height:1}
+.final .stars{font-size:3rem}
+.final .row{justify-content:center;margin-top:1.4rem}
+.final p{margin-left:auto;margin-right:auto}
+
+:where([lang="kk"]) h1,:where([lang="kk"]) h2,:where([lang="kk"]) .hand,:where([lang="kk"]) .big,:where([lang="kk"]) .ex,:where([lang="kk"]) .sect,:where([lang="kk"]) .good,:where([lang="kk"]) .cnt b,:where([lang="kk"]) .hero .nm,:where([lang="kk"]) .opts .btn,:where([lang="kk"]) .nums .btn,:where([lang="kk"]) .topic::before{font-weight:700}
+:where([lang="kk"]) h1{font-size:clamp(1.8rem,7vw,2.8rem)}
+:where([lang="kk"]) .big{font-size:clamp(2.4rem,11vw,4rem)}
+:where([lang="kk"]) .opts.words .btn{font-size:1.05rem;overflow-wrap:anywhere}
+:where([lang="kk"]) .ex{font-size:clamp(1.6rem,6.5vw,2.4rem)}
+/* ===== сказочная тема ===== */
+:root{--paper:#F4ECFF;--line:#C9B6F2;--ink:#3B2A6B;--margin:#D9487A;--card:#FFFFFF;--ok:#23855A;--no:#C7355F;--star:#F5B700;--soft:#F1E9FF;--bg:linear-gradient(180deg,#BFD6FF 0%,#E9D3F7 55%,#FFE3C4 100%);--on-main:#FFFFFF;--main-sh:#A8325A;--scene:1;--cloud:.9;--panel-sh:rgba(59,42,107,.14)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#1B1740;--line:#6A58B8;--ink:#F6F0FF;--margin:#FF9EC0;--card:#2A2358;--ok:#7EE2B0;--no:#FFA0B4;--star:#FFD95E;--soft:#382E72;--bg:linear-gradient(180deg,#141033 0%,#2B2060 60%,#4A3378 100%);--on-main:#2A1040;--main-sh:#C76A92;--scene:.45;--cloud:.18;--panel-sh:rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--paper:#1B1740;--line:#6A58B8;--ink:#F6F0FF;--margin:#FF9EC0;--card:#2A2358;--ok:#7EE2B0;--no:#FFA0B4;--star:#FFD95E;--soft:#382E72;--bg:linear-gradient(180deg,#141033 0%,#2B2060 60%,#4A3378 100%);--on-main:#2A1040;--main-sh:#C76A92;--scene:.45;--cloud:.18;--panel-sh:rgba(0,0,0,.35)}
+body{background:var(--bg) fixed var(--paper);background-size:auto;padding-bottom:24vh}
+body::before{left:0;right:0;top:auto;bottom:0;width:auto;height:34vh;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 300' preserveAspectRatio='xMidYMax slice'%3E%3Cpath d='M0 190 Q300 80 620 180 T1200 150 V300 H0Z' fill='%23B9E3C6'/%3E%3Cg transform='translate%28860 60%29'%3E%3Crect x='0' y='60' width='150' height='90' fill='%23D9C2F7'/%3E%3Crect x='-22' y='30' width='40' height='120' fill='%23CDB2F2'/%3E%3Crect x='132' y='30' width='40' height='120' fill='%23CDB2F2'/%3E%3Crect x='52' y='10' width='46' height='140' fill='%23E3D2FA'/%3E%3Cpath d='M-30 30 L-2 -18 L26 30Z M124 30 L152 -18 L180 30Z M42 10 L75 -44 L108 10Z' fill='%23D9487A'/%3E%3Cpath d='M75 -44 V-66 L98 -58 L75 -50' fill='%23F5B700' stroke='%23F5B700' stroke-width='2'/%3E%3Cpath d='M60 150 V112 Q75 92 90 112 V150Z' fill='%238A63D2'/%3E%3Crect x='-10' y='60' width='14' height='20' rx='7' fill='%23FFE08A'/%3E%3Crect x='146' y='60' width='14' height='20' rx='7' fill='%23FFE08A'/%3E%3Crect x='68' y='40' width='14' height='22' rx='7' fill='%23FFE08A'/%3E%3Crect x='20' y='84' width='14' height='20' rx='7' fill='%23FFE08A'/%3E%3Crect x='116' y='84' width='14' height='20' rx='7' fill='%23FFE08A'/%3E%3C/g%3E%3Cpath d='M0 250 Q260 160 540 235 T1200 215 V300 H0Z' fill='%238FD0A5'/%3E%3Cg fill='%236FBF8E'%3E%3Ccircle cx='120' cy='196' r='34'/%3E%3Ccircle cx='170' cy='210' r='26'/%3E%3Ccircle cx='330' cy='200' r='22'/%3E%3Ccircle cx='1120' cy='196' r='28'/%3E%3C/g%3E%3Cg fill='%238B6A4F'%3E%3Crect x='116' y='222' width='8' height='30'/%3E%3Crect x='167' y='230' width='6' height='24'/%3E%3Crect x='327' y='218' width='6' height='22'/%3E%3Crect x='1116' y='220' width='8' height='24'/%3E%3C/g%3E%3Cg fill='%23FFFFFF'%3E%3Ccircle cx='420' cy='262' r='5'/%3E%3Ccircle cx='470' cy='272' r='5'/%3E%3Ccircle cx='700' cy='258' r='5'/%3E%3Ccircle cx='760' cy='270' r='5'/%3E%3Ccircle cx='240' cy='270' r='5'/%3E%3C/g%3E%3Cg fill='%23F5B700'%3E%3Ccircle cx='420' cy='262' r='2'/%3E%3Ccircle cx='470' cy='272' r='2'/%3E%3Ccircle cx='700' cy='258' r='2'/%3E%3Ccircle cx='760' cy='270' r='2'/%3E%3Ccircle cx='240' cy='270' r='2'/%3E%3C/g%3E%3C/svg%3E") center bottom/cover no-repeat;opacity:var(--scene);z-index:-1}
+body::after{content:"";position:fixed;left:0;right:0;top:0;height:20vh;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 160' preserveAspectRatio='xMidYMin slice'%3E%3Cg fill='%23FFFFFF'%3E%3Cellipse cx='150' cy='60' rx='70' ry='24'/%3E%3Cellipse cx='200' cy='44' rx='46' ry='22'/%3E%3Cellipse cx='1000' cy='80' rx='80' ry='26'/%3E%3Cellipse cx='950' cy='62' rx='48' ry='22'/%3E%3Cellipse cx='600' cy='36' rx='54' ry='18'/%3E%3C/g%3E%3Cg fill='%23F5B700'%3E%3Cpath d='M420 70l4 10 10 1-8 7 3 10-9-6-9 6 3-10-8-7 10-1z'/%3E%3Cpath d='M780 40l3 8 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z'/%3E%3Cpath d='M60 120l3 8 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z'/%3E%3Cpath d='M1130 30l3 8 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z'/%3E%3C/g%3E%3C/svg%3E") center top/cover no-repeat;opacity:var(--cloud);z-index:-1;pointer-events:none}
+#app{width:calc(100% - 1.5rem);max-width:44rem;margin:1.2rem auto;padding:1.6rem 1.25rem 2rem;background:var(--card);border-radius:28px;box-shadow:0 10px 0 var(--panel-sh)}
+.btn{background:var(--soft);border:2px solid var(--line);border-radius:20px;box-shadow:0 5px 0 var(--line);padding:.95rem 1.25rem;min-height:3.5rem;font-size:1.15rem}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--line)}
+.btn.plain{background:transparent;min-height:2.9rem;padding:.6rem 1rem;font-size:1.05rem;box-shadow:none}
+.btn.main{background:var(--margin);border-color:var(--main-sh);color:var(--on-main);box-shadow:0 5px 0 var(--main-sh)}
+.btn.main:active{box-shadow:0 1px 0 var(--main-sh)}
+.btn[disabled]{box-shadow:none}
+.heroes{grid-template-columns:repeat(auto-fit,minmax(10.5rem,1fr));gap:1.1rem}
+.hero{padding:1.2rem .7rem;border-radius:26px}
+.hero .em,.say .em,.final .em{display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--card),var(--soft) 70%);border:3px solid var(--line)}
+.hero .em{font-size:4rem;width:6.4rem;height:6.4rem;margin-bottom:.4rem}
+.say .em{font-size:3.4rem;width:5.4rem;height:5.4rem;animation:bob 3s ease-in-out infinite}
+.final .em{font-size:5.5rem;width:9rem;height:9rem;margin:0 auto 1rem}
+@keyframes bob{50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion: reduce){.say .em{animation:none}}
+.own{border-color:var(--line);border-radius:24px;padding:1.2rem}
+.own input{border:2px solid var(--line);border-radius:16px;padding:.85rem 1rem;min-height:3.4rem}
+.pick .btn.plain{width:3.5rem;height:3.5rem;min-height:0;font-size:1.8rem;padding:0}
+.pick .btn.plain[aria-pressed="true"]{background:var(--margin);border-color:var(--main-sh)}
+.topics{gap:1rem}
+.topic{padding:.9rem 1rem;border-radius:22px}
+.topic::before{width:3.3rem;height:3.3rem;border:0;background:var(--card);color:var(--margin);font-size:1.7rem;box-shadow:inset 0 0 0 2px var(--line)}
+.sect + .topics li:nth-child(1) .topic::before{content:"🍎"}
+.sect + .topics li:nth-child(2) .topic::before{content:"🏘️"}
+.sect + .topics li:nth-child(3) .topic::before{content:"🧩"}
+.sect + .topics li:nth-child(4) .topic::before{content:"⚖️"}
+.sect + .topics li:nth-child(5) .topic::before{content:"🫙"}
+.sect + .topics li:nth-child(6) .topic::before{content:"🏠"}
+.sect + .topics li:nth-child(7) .topic::before{content:"👣"}
+.sect + .topics li:nth-child(8) .topic::before{content:"➕"}
+.sect + .topics li:nth-child(9) .topic::before{content:"🏷️"}
+.sect + .topics li:nth-child(10) .topic::before{content:"🕵️"}
+.sect + .topics li:nth-child(11) .topic::before{content:"📈"}
+.sect + .topics li:nth-child(12) .topic::before{content:"📏"}
+.sect + .topics li:nth-child(13) .topic::before{content:"🔍"}
+.sect + .topics li:nth-child(14) .topic::before{content:"📖"}
+.sect + .topics li:nth-child(15) .topic::before{content:"🔺"}
+.sect + .topics li:nth-child(16) .topic::before{content:"📐"}
+.sect + .topics li:nth-child(17) .topic::before{content:"🔟"}
+.sect + .topics li:nth-child(18) .topic::before{content:"💯"}
+.sect + .topics li:nth-child(19) .topic::before{content:"🧮"}
+.sect + .topics li:nth-child(20) .topic::before{content:"🎯"}
+.bubble{background:var(--soft);border:2px solid var(--line);border-radius:6px 24px 24px 24px;padding:1rem 1.15rem}
+.opts{gap:.9rem}
+.opts .btn{min-height:5.2rem;font-size:2.4rem;border-radius:22px}
+.nums{grid-template-columns:repeat(auto-fill,minmax(4rem,1fr));gap:.6rem}
+.nums .btn{min-height:3.6rem;border-radius:16px;box-shadow:0 4px 0 var(--line)}
+.nums .solved{box-shadow:none}
+.vis{background:var(--soft);border:2px dashed var(--line);border-radius:22px}
+.hint{border-radius:0 18px 18px 0}
+.steps span{border-color:var(--line)}
+.steps .now{background:var(--margin);border-color:var(--margin)}
+.sect{color:var(--margin)}
+
+.art{width:1.2em;height:1.2em;display:inline-block;vertical-align:-.25em}
+.em .art{vertical-align:middle}
+.big.club{font-size:clamp(2rem,9vw,3.2rem);letter-spacing:.04em;gap:.2em}
+.big.club svg{max-width:60%;height:auto}
+#foot{width:calc(100% - 1.5rem);max-width:44rem;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap;background:var(--card);border-radius:18px;padding:.6rem 1rem;font-size:.95rem;box-shadow:0 6px 0 var(--panel-sh)}
+#foot .btn{min-height:2.6rem;padding:.4rem .9rem;font-size:1rem}
+.lang h1+h1{margin-top:.4rem}
+.lang .row{justify-content:center;margin-top:1.4rem}
+h1{font-size:clamp(1.7rem,6.5vw,2.6rem)}
+
+/* ===== сочные краски ===== */
+:root{--paper:#F4ECFF;--line:#B79CFF;--ink:#2B1E6B;--margin:#F02D6F;--ok:#0E8A50;--no:#C7355F;--star:#FFC400;--soft:#F0E8FF;--bg:linear-gradient(180deg,#4FC0FF 0%,#9DB7FF 42%,#FFB8DE 76%,#FFE08A 100%);--main-sh:#B3154E;--scene:1;--cloud:1}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--scene:.62;--cloud:.3;--main-sh:#8E1040}}
+:root[data-theme="dark"]{--scene:.62;--cloud:.3;--main-sh:#8E1040}
+body::before{height:40vh;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 300' preserveAspectRatio='xMidYMax slice'%3E%3Ccircle cx='250' cy='305' r='230' fill='none' stroke='%23FF5A5F' stroke-width='13'/%3E%3Ccircle cx='250' cy='305' r='217' fill='none' stroke='%23FF9F1C' stroke-width='13'/%3E%3Ccircle cx='250' cy='305' r='204' fill='none' stroke='%23FFD93B' stroke-width='13'/%3E%3Ccircle cx='250' cy='305' r='191' fill='none' stroke='%233DDC84' stroke-width='13'/%3E%3Ccircle cx='250' cy='305' r='178' fill='none' stroke='%233DA5FF' stroke-width='13'/%3E%3Ccircle cx='250' cy='305' r='165' fill='none' stroke='%239B5DE5' stroke-width='13'/%3E%3Cpath d='M0 190 Q300 80 620 180 T1200 150 V300 H0Z' fill='%238BE28B'/%3E%3Cg stroke='%237A5BC9' stroke-width='2' fill='none'%3E%3Cpath d='M590 150 Q600 120 584 96'/%3E%3Cpath d='M590 150 Q612 118 622 84'/%3E%3Cpath d='M590 150 Q580 124 552 108'/%3E%3C/g%3E%3Cellipse cx='584' cy='74' rx='18' ry='23' fill='%23FF4F79'/%3E%3Cellipse cx='624' cy='62' rx='18' ry='23' fill='%23FFD93B'/%3E%3Cellipse cx='548' cy='88' rx='17' ry='22' fill='%233DA5FF'/%3E%3Cg transform='translate%28860 56%29'%3E%3Crect x='0' y='60' width='150' height='96' fill='%23FFB3D1'/%3E%3Crect x='-24' y='30' width='42' height='126' fill='%23C79BFF'/%3E%3Crect x='132' y='30' width='42' height='126' fill='%23C79BFF'/%3E%3Crect x='51' y='8' width='48' height='148' fill='%23FFD0E4'/%3E%3Cpath d='M-33 30 L-3 -22 L27 30Z M123 30 L153 -22 L183 30Z' fill='%233DA5FF'/%3E%3Cpath d='M40 8 L75 -50 L110 8Z' fill='%23FF4F79'/%3E%3Cpath d='M75 -50 V-74 L100 -65 L75 -56Z' fill='%23FFD93B'/%3E%3Cpath d='M-3 -22 V-40 L14 -34 L-3 -28Z M153 -22 V-40 L170 -34 L153 -28Z' fill='%23FF9F1C'/%3E%3Cpath d='M58 156 V114 Q75 92 92 114 V156Z' fill='%237B4DDB'/%3E%3Cg fill='%23FFF3A3'%3E%3Crect x='-10' y='58' width='15' height='22' rx='7.5'/%3E%3Crect x='146' y='58' width='15' height='22' rx='7.5'/%3E%3Crect x='67' y='36' width='16' height='24' rx='8'/%3E%3Crect x='18' y='84' width='15' height='22' rx='7.5'/%3E%3Crect x='117' y='84' width='15' height='22' rx='7.5'/%3E%3C/g%3E%3C/g%3E%3Cpath d='M0 245 Q260 160 540 232 T1200 212 V300 H0Z' fill='%235FD068'/%3E%3Cg fill='%232FAE5E'%3E%3Ccircle cx='120' cy='190' r='36'/%3E%3Ccircle cx='172' cy='206' r='27'/%3E%3Ccircle cx='340' cy='196' r='23'/%3E%3Ccircle cx='1120' cy='190' r='30'/%3E%3C/g%3E%3Cg fill='%23FF4F79'%3E%3Ccircle cx='108' cy='182' r='5'/%3E%3Ccircle cx='134' cy='198' r='5'/%3E%3Ccircle cx='176' cy='200' r='4.5'/%3E%3Ccircle cx='1112' cy='184' r='5'/%3E%3Ccircle cx='1130' cy='200' r='5'/%3E%3Ccircle cx='336' cy='192' r='4'/%3E%3C/g%3E%3Cg fill='%239A6B45'%3E%3Crect x='116' y='220' width='9' height='32'/%3E%3Crect x='168' y='228' width='7' height='26'/%3E%3Crect x='337' y='214' width='6' height='24'/%3E%3Crect x='1116' y='216' width='9' height='26'/%3E%3C/g%3E%3Cpath d='M0 278 Q300 240 600 272 T1200 262 V300 H0Z' fill='%233DBE6B'/%3E%3Ccircle cx='230' cy='268' r='7' fill='%23FF5A5F'/%3E%3Ccircle cx='230' cy='268' r='2.6' fill='%23FFD93B'/%3E%3Ccircle cx='300' cy='280' r='7' fill='%23FFFFFF'/%3E%3Ccircle cx='300' cy='280' r='2.6' fill='%23FFD93B'/%3E%3Ccircle cx='420' cy='262' r='7' fill='%23C77DFF'/%3E%3Ccircle cx='420' cy='262' r='2.6' fill='%23FFD93B'/%3E%3Ccircle cx='480' cy='278' r='7' fill='%23FF9F1C'/%3E%3Ccircle cx='480' cy='278' r='2.6' fill='%23FFD93B'/%3E%3Ccircle cx='640' cy='270' r='7' fill='%23FF6FB5'/%3E%3Ccircle cx='640' cy='270' r='2.6' fill='%23FFD93B'/%3E%3Ccircle cx='710' cy='256' r='7' fill='%23FFFFFF'/%3E%3Ccircle cx='710' cy='256' r='2.6' fill='%23FFD93B'/%3E%3Ccircle cx='770' cy='274' r='7' fill='%233DA5FF'/%3E%3Ccircle cx='770' cy='274' r='2.6' fill='%23FFD93B'/%3E%3Ccircle cx='1010' cy='266' r='7' fill='%23FF5A5F'/%3E%3Ccircle cx='1010' cy='266' r='2.6' fill='%23FFD93B'/%3E%3Ccircle cx='1070' cy='280' r='7' fill='%23C77DFF'/%3E%3Ccircle cx='1070' cy='280' r='2.6' fill='%23FFD93B'/%3E%3Ccircle cx='60' cy='276' r='7' fill='%23FF9F1C'/%3E%3Ccircle cx='60' cy='276' r='2.6' fill='%23FFD93B'/%3E%3C/svg%3E") center bottom/cover no-repeat}
+body::after{height:24vh;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 160' preserveAspectRatio='xMidYMin slice'%3E%3Cpath d='M1080 62 L1150 62' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M1080 62 L1141 97' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M1080 62 L1115 123' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M1080 62 L1080 132' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M1080 62 L1045 123' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M1080 62 L1019 97' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M1080 62 L1010 62' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M1080 62 L1019 27' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M1080 62 L1045 1' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M1080 62 L1080 -8' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M1080 62 L1115 1' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M1080 62 L1141 27' stroke='%23FFC400' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='1080' cy='62' r='40' fill='%23FFD93B'/%3E%3Ccircle cx='1067' cy='56' r='4' fill='%23C98A00'/%3E%3Ccircle cx='1093' cy='56' r='4' fill='%23C98A00'/%3E%3Cpath d='M1064 72 Q1080 86 1096 72' fill='none' stroke='%23C98A00' stroke-width='4' stroke-linecap='round'/%3E%3Cg fill='%23FFFFFF'%3E%3Cellipse cx='150' cy='64' rx='76' ry='26'/%3E%3Cellipse cx='200' cy='46' rx='50' ry='24'/%3E%3Cellipse cx='110' cy='48' rx='36' ry='18'/%3E%3Cellipse cx='900' cy='96' rx='70' ry='22'/%3E%3Cellipse cx='860' cy='80' rx='42' ry='20'/%3E%3Cellipse cx='560' cy='40' rx='60' ry='20'/%3E%3Cellipse cx='600' cy='28' rx='34' ry='16'/%3E%3C/g%3E%3Cg fill='none' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M330 70 q10 -12 20 0 q10 -12 20 0' stroke='%237B4DDB'/%3E%3Cpath d='M420 40 q8 -10 16 0 q8 -10 16 0' stroke='%23FF4F79'/%3E%3Cpath d='M720 80 q9 -11 18 0 q9 -11 18 0' stroke='%233DA5FF'/%3E%3C/g%3E%3C/svg%3E") center top/cover no-repeat}
+#app{border-top:12px solid transparent;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(90deg,#FF5A5F,#FF9F1C,#FFD93B,#3DDC84,#3DA5FF,#9B5DE5) border-box}
+h1{color:var(--margin)}
+.btn.main{background:linear-gradient(180deg,#FF5C93,#E8246A);border-color:var(--main-sh);color:#FFFFFF;box-shadow:0 5px 0 var(--main-sh)}
+.opts .btn:nth-child(1):not(.ok){background:#FFE0EC;border-color:#FF6FA3;box-shadow:0 5px 0 #FF6FA3;color:#2B1E6B}
+.opts .btn:nth-child(2):not(.ok){background:#FFF0B0;border-color:#F2B400;box-shadow:0 5px 0 #F2B400;color:#2B1E6B}
+.opts .btn:nth-child(3):not(.ok){background:#D6EEFF;border-color:#3DA5FF;box-shadow:0 5px 0 #3DA5FF;color:#2B1E6B}
+.opts .btn:nth-child(4):not(.ok){background:#D9F7DC;border-color:#34C36A;box-shadow:0 5px 0 #34C36A;color:#2B1E6B}
+.opts .btn.no:nth-child(n){color:#C7355F;border-color:#C7355F;box-shadow:0 5px 0 #C7355F}
+.topics li:nth-child(4n+1) .topic::before{background:#FFE0EC;box-shadow:inset 0 0 0 3px #FF6FA3;color:#B3154E}
+.topics li:nth-child(4n+1) .topic{border-color:#FF6FA3;box-shadow:0 5px 0 #FF6FA3}
+.topics li:nth-child(4n+2) .topic::before{background:#FFF0B0;box-shadow:inset 0 0 0 3px #F2B400;color:#B3154E}
+.topics li:nth-child(4n+2) .topic{border-color:#F2B400;box-shadow:0 5px 0 #F2B400}
+.topics li:nth-child(4n+3) .topic::before{background:#D6EEFF;box-shadow:inset 0 0 0 3px #3DA5FF;color:#B3154E}
+.topics li:nth-child(4n+3) .topic{border-color:#3DA5FF;box-shadow:0 5px 0 #3DA5FF}
+.topics li:nth-child(4n+4) .topic::before{background:#D9F7DC;box-shadow:inset 0 0 0 3px #34C36A;color:#B3154E}
+.topics li:nth-child(4n+4) .topic{border-color:#34C36A;box-shadow:0 5px 0 #34C36A}
+.nums .btn:nth-child(4n+1):not(.solved){background:#FFE0EC;border-color:#FF6FA3;box-shadow:0 4px 0 #FF6FA3;color:#2B1E6B}
+.nums .btn:nth-child(4n+2):not(.solved){background:#FFF0B0;border-color:#F2B400;box-shadow:0 4px 0 #F2B400;color:#2B1E6B}
+.nums .btn:nth-child(4n+3):not(.solved){background:#D6EEFF;border-color:#3DA5FF;box-shadow:0 4px 0 #3DA5FF;color:#2B1E6B}
+.nums .btn:nth-child(4n+4):not(.solved){background:#D9F7DC;border-color:#34C36A;box-shadow:0 4px 0 #34C36A;color:#2B1E6B}
+.hero .em,.say .em,.final .em{background:#FFFFFF;border:4px solid #FFC400;box-shadow:0 0 0 4px #FF6FA3}
+.em .art{width:1.42em;height:1.42em;border-radius:50%}
+.hero:nth-child(4n+1){background:#FFE0EC;border-color:#FF6FA3;box-shadow:0 5px 0 #FF6FA3;color:#2B1E6B}
+.hero:nth-child(4n+2){background:#FFF0B0;border-color:#F2B400;box-shadow:0 5px 0 #F2B400;color:#2B1E6B}
+.hero:nth-child(4n+3){background:#D6EEFF;border-color:#3DA5FF;box-shadow:0 5px 0 #3DA5FF;color:#2B1E6B}
+.hero:nth-child(4n+4){background:#D9F7DC;border-color:#34C36A;box-shadow:0 5px 0 #34C36A;color:#2B1E6B}
+.big.pics span{filter:drop-shadow(0 3px 0 rgba(43,30,107,.18))}
+.cnt span{filter:drop-shadow(0 3px 0 rgba(43,30,107,.18))}
+.good{font-size:2.2rem}
+#foot[hidden]{display:none}
+.cover{position:relative;overflow:hidden;border-radius:20px;min-height:min(80vh,46rem);display:grid;place-items:center;text-align:center;padding:1.5rem .4rem}
+.cover .play{position:absolute;inset:0;pointer-events:none}
+.dg{position:absolute;left:0;top:0;font-family:var(--disp),"Comic Sans MS",cursive;font-weight:700;line-height:1;opacity:.62;will-change:transform;text-shadow:0 3px 0 rgba(43,30,107,.16)}
+.dg i{position:absolute;left:50%;top:12%;width:.52em;height:.22em;transform:translateX(-50%);background:radial-gradient(circle at 22% 50%,#2B1E6B 0 .045em,#fff .05em .1em,transparent .105em),radial-gradient(circle at 78% 50%,#2B1E6B 0 .045em,#fff .05em .1em,transparent .105em)}
+.cover-text{position:relative;z-index:1;display:grid;gap:.7rem;justify-items:center}
+.cover h1{max-width:20ch;text-shadow:0 0 10px var(--card),0 0 10px var(--card),0 0 4px var(--card),0 0 4px var(--card)}
+.cover h1[lang="kk"]{color:#7A3DF0}
+.cover .who{display:flex;gap:.25rem;flex-wrap:wrap;justify-content:center;font-size:clamp(2.2rem,9vw,3.4rem);line-height:1}
+.cover .who .art{border-radius:50%;box-shadow:0 0 0 3px #fff,0 4px 0 rgba(43,30,107,.18)}
+.cover .chips{display:flex;gap:.5rem;margin:0}
+.cover .chips span{background:#FFF0B0;color:#2B1E6B;border:2px solid #F2B400;border-radius:999px;padding:.2rem .9rem;font-weight:800}
+.cover .row{justify-content:center}
+.cover .row .btn{min-width:9.5rem;font-size:1.3rem}
+.cover .by{margin:.4rem 0 0;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:.5rem 1.1rem;font-size:.95rem;line-height:1.35}
+.cover .by strong{font-size:1.2rem}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cover h1[lang="kk"]{color:#D7B0FF}}
+:root[data-theme="dark"] .cover h1[lang="kk"]{color:#D7B0FF}
+.pts{color:#F2B400;font-size:1.35rem;letter-spacing:.08em;white-space:nowrap}
+.gain{display:inline-block;background:#FFF0B0;color:#2B1E6B;border:2px solid #F2B400;border-radius:999px;padding:0 .6rem;font-size:1.4rem;vertical-align:middle}
+.field{margin:0 0 1rem}
+.field label{display:block;font-weight:700;margin-bottom:.3rem}
+.field input{width:100%;max-width:26rem;padding:.85rem 1rem;min-height:3.4rem;border:2px solid var(--line);border-radius:16px;background:var(--card);font-weight:700}
+.card{background:#FFF0B0;color:#2B1E6B;border:2px solid #F2B400;border-radius:22px;padding:1rem 1.2rem}
+.pname{font-family:var(--disp),"Comic Sans MS",cursive;font-weight:700;font-size:2rem;line-height:1.15}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}
+.stats div{border-radius:20px;padding:.8rem .5rem;text-align:center;color:#2B1E6B;border:2px solid}
+.stats div:nth-child(1){background:#FFE0EC;border-color:#FF6FA3}
+.stats div:nth-child(2){background:#D6EEFF;border-color:#3DA5FF}
+.stats div:nth-child(3){background:#D9F7DC;border-color:#34C36A}
+.stats b{display:block;font-family:var(--disp),"Comic Sans MS",cursive;font-size:clamp(2rem,9vw,3rem);line-height:1.1;font-variant-numeric:tabular-nums}
+.stats span{font-size:.9rem;font-weight:700}
+.lev{font-weight:800;font-size:1.2rem;color:var(--margin)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:.55rem .6rem;border-bottom:2px solid var(--soft)}
+th{font-size:.95rem}
+.rule{background:var(--soft);border-radius:16px;padding:.8rem 1rem;font-size:.98rem;max-width:none}
+.sky{position:relative;overflow:hidden;margin:-1.6rem -1.25rem -2rem;padding:1.6rem 1.25rem 2rem;border-radius:0 0 28px 28px;background:radial-gradient(circle at 14% 6%,rgba(255,255,255,.5) 0 5rem,transparent 5.1rem),radial-gradient(circle at 88% 28%,rgba(255,255,255,.35) 0 4rem,transparent 4.1rem),radial-gradient(circle at 20% 62%,rgba(255,255,255,.3) 0 6rem,transparent 6.1rem),radial-gradient(circle at 80% 90%,rgba(255,255,255,.35) 0 5rem,transparent 5.1rem),linear-gradient(165deg,#22B5FF 0%,#6F7BFF 35%,#FF62B0 68%,#FFC233 100%)}
+.sky .play{position:absolute;inset:0;pointer-events:none}
+.brand{font-family:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;font-weight:400;font-size:clamp(3.6rem,19vw,6.5rem);line-height:1;letter-spacing:.06em;color:var(--margin);background:linear-gradient(90deg,#FF4F79,#FF9F1C,#F2B400,#34C36A,#3DA5FF,#9B5DE5);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 0 rgba(43,30,107,.2)) drop-shadow(0 0 8px var(--card))}
+.cover h1{font-size:clamp(1.3rem,5.2vw,1.9rem)}
+.sky .skyin{position:relative;z-index:1}
+.sky .skyin>.row.sp,.sky .skyin>p{background:var(--card);border-radius:18px;padding:.5rem .9rem;margin:0 0 .8rem}
+.sky .skyin>p.sect{display:inline-block}
+.sky .dg{opacity:.95;text-shadow:0 2px 0 rgba(43,30,107,.45)}
+.pl{position:absolute;left:0;top:0;line-height:0;will-change:transform;filter:drop-shadow(0 3px 0 rgba(43,30,107,.3))}
+.sky .topics{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(10,auto);grid-auto-flow:column;gap:.7rem;margin-top:0}
+.sky .topics li{display:grid}
+.sky .topic{grid-template-columns:1fr;justify-items:center;text-align:center;height:100%;padding:.7rem .4rem;gap:.3rem;overflow-wrap:anywhere;font-size:1.02rem}
+.sky .topic small{font-size:.8rem}
+@media (min-width:36rem){.sky .topic{grid-template-columns:auto 1fr;justify-items:start;text-align:left;padding:.8rem .9rem;gap:.2rem .7rem}.sky .topic::before{grid-row:span 2}.sky .topic>span:last-child{grid-column:2}}
+#foot .row{gap:.3rem}
+.demo{display:inline-block;background:#FFE14D;color:#2B1E6B;border:2px solid #F2B400;border-radius:999px;padding:.15rem .9rem;font-weight:800;margin:.2rem 0 .6rem}
+.cover .demo{font-size:1.15rem;margin:0}
+.sky .skyin>p.demo{background:#FFE14D;padding:.15rem .9rem}
+.btn.locked{opacity:.78;filter:saturate(.55)}
+.btn.locked small{font-weight:800}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<footer id="foot"></footer>
+<script>
+/* ---------- баллы: общая часть для обоих языков ---------- */
+var LV={count:1,neigh:1,miss:1,cmp:1,zero:1,plus123:1,shapes:1,comp:2,calc:2,names:2,incdec:2,diffcmp:2,cm:2,tens:2,place:2,unk:3,cmpexpr:3,word:3,teen:3,add100s:3};
+var SCORE={
+  /* сложность задачи -> сколько секунд даётся на 3 балла и на 2 балла */
+  lim:{1:[8,16],2:[15,30],3:[30,60]},cur:null,iv:null,
+  start:function(level){
+    var sc={t0:Date.now(),miss:0,level:SCORE.lim[level]?level:2,end:false};SCORE.cur=sc;
+    try{var row=document.querySelector('#app .row.sp');if(row){var e=document.createElement('b');e.id='pts';e.className='pts';row.appendChild(e);}}catch(err){}
+    SCORE.paint(sc);
+    if(SCORE.iv)clearInterval(SCORE.iv);
+    SCORE.iv=setInterval(function(){
+      if(SCORE.cur!==sc||sc.end||!document.getElementById('pts')){clearInterval(SCORE.iv);SCORE.iv=null;return;}
+      SCORE.paint(sc);},500);
+    return sc;
+  },
+  now:function(sc){var t=(Date.now()-sc.t0)/1000,l=SCORE.lim[sc.level],p=t<=l[0]?3:t<=l[1]?2:1;return Math.max(1,p-sc.miss);},
+  paint:function(sc){try{var e=document.getElementById('pts');if(!e||e.id!=='pts')return;var p=SCORE.now(sc);e.textContent='★★★'.slice(0,p)+'☆☆☆'.slice(0,3-p);e.setAttribute('aria-label',p+' / 3');}catch(err){}},
+  finish:function(sc){var p=SCORE.now(sc);sc.end=true;return p;},
+  badge:function(p){return '<span class="gain">+'+p+' ★</span>';}
+};
+/* ---------- фон экрана тем: летающие самолётики и цифры ---------- */
+function flyPlay(box){
+  if(!box||!box.appendChild||!box.style)return;
+  var colors=['#FFFFFF','#FFE14D','#FF5C93','#7CF2A0','#8AD4FF','#FFB347'],digits=[],planes=[],i,j,still=false;
+  try{still=window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  var W=box.clientWidth||600,H=box.clientHeight||900;
+  var PLANE='<svg viewBox="0 0 64 40" width="1em" height=".62em"><path d="M2 6 L62 20 L2 34 L14 20Z" fill="currentColor"/><path d="M14 20 L62 20 L2 34Z" fill="rgba(0,0,0,.22)"/></svg>';
+  for(i=0;i<14;i++){
+    var el=document.createElement('span'),size=34+Math.random()*26,ang=Math.random()*6.283,sp=.5+Math.random()*.7;
+    el.className='dg';el.textContent=String(i%10);el.style.color=colors[i%colors.length];el.style.fontSize=size+'px';
+    el.appendChild(document.createElement('i'));box.appendChild(el);
+    digits.push({el:el,r:size*.42,x:size+Math.random()*Math.max(1,W-2*size),y:size+Math.random()*Math.max(1,H-2*size),vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,ph:Math.random()*6.283,hop:0});
+  }
+  for(i=0;i<6;i++){
+    var pl=document.createElement('span'),ps=44+Math.random()*26,dir=i%2?-1:1;
+    pl.className='pl';pl.innerHTML=PLANE;pl.style.color=colors[(i+2)%colors.length];pl.style.fontSize=ps+'px';box.appendChild(pl);
+    planes.push({el:pl,s:ps,x:Math.random()*W,y:40+Math.random()*Math.max(1,H-80),vx:dir*(1.1+Math.random()*1.1),ph:Math.random()*6.283});
+  }
+  function draw(t){
+    digits.forEach(function(d){
+      d.el.style.transform='translate('+(d.x-d.r).toFixed(1)+'px,'+(d.y-d.r).toFixed(1)+'px) rotate('+(Math.sin(t/500+d.ph)*10).toFixed(1)+'deg) scale('+(1+d.hop*.35).toFixed(2)+')';
+    });
+    planes.forEach(function(p){
+      var bob=Math.sin(t/600+p.ph),tilt=bob*14+(p.vx<0?180:0);
+      p.el.style.transform='translate('+p.x.toFixed(1)+'px,'+(p.y+bob*18).toFixed(1)+'px) rotate('+tilt.toFixed(1)+'deg)';
+    });
+  }
+  draw(0);
+  if(still)return;
+  var last=0;
+  function step(t){
+    if(!box.isConnected)return;
+    var dt=Math.min(3,last?(t-last)/16.7:1);last=t;W=box.clientWidth;H=box.clientHeight;
+    for(i=0;i<digits.length;i++){
+      var d=digits[i];d.x+=d.vx*dt;d.y+=d.vy*dt;d.hop*=.9;
+      if(d.x<d.r){d.x=d.r;d.vx=Math.abs(d.vx);}else if(d.x>W-d.r){d.x=W-d.r;d.vx=-Math.abs(d.vx);}
+      if(d.y<d.r){d.y=d.r;d.vy=Math.abs(d.vy);}else if(d.y>H-d.r){d.y=H-d.r;d.vy=-Math.abs(d.vy);}
+    }
+    for(i=0;i<digits.length;i++)for(j=i+1;j<digits.length;j++){
+      var p=digits[i],q=digits[j],dx=q.x-p.x,dy=q.y-p.y,dist=Math.sqrt(dx*dx+dy*dy),min=p.r+q.r;
+      if(dist>0&&dist<min){
+        var nx=dx/dist,ny=dy/dist,rel=(p.vx-q.vx)*nx+(p.vy-q.vy)*ny,push=(min-dist)/2;
+        p.x-=nx*push;p.y-=ny*push;q.x+=nx*push;q.y+=ny*push;
+        if(rel>0){p.vx-=rel*nx;p.vy-=rel*ny;q.vx+=rel*nx;q.vy+=rel*ny;p.hop=1;q.hop=1;}
+      }
+    }
+    planes.forEach(function(a){
+      a.x+=a.vx*dt;
+      if(a.vx>0&&a.x>W+10){a.x=-a.s-10;a.y=40+Math.random()*Math.max(1,H-80);}
+      else if(a.vx<0&&a.x<-a.s-10){a.x=W+10;a.y=40+Math.random()*Math.max(1,H-80);}
+    });
+    draw(t);
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+</script>
+<script>
+
+function startKk(){
+"use strict";
+var RAND=function(){return Math.random();},RNG=RAND;
+var app=document.getElementById('app');
+var KEY='azima-demo-kk',DEMO_T=5,DEMO_C=3;
+var ART={tim:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-tim" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#FFC24D"/><stop offset="1" stop-color="#FF8A1F"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-tim)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><path d="M20 100 Q50 72 80 100Z" fill="#2F6BFF"/><circle cx="50" cy="47" r="41" fill="#BFE3FF" stroke="#2F6BFF" stroke-width="4"/><circle cx="50" cy="52" r="28" fill="#FFD9B8"/><path d="M23 48 Q28 22 50 23 Q72 22 77 48 Q63 34 50 37 Q37 34 23 48Z" fill="#7A4B2A"/><circle cx="40" cy="53" r="5" fill="#2B2B4A"/><circle cx="41.6" cy="51.2" r="1.7" fill="#fff"/><circle cx="60" cy="53" r="5" fill="#2B2B4A"/><circle cx="61.6" cy="51.2" r="1.7" fill="#fff"/><circle cx="31" cy="63" r="4.5" fill="#FF9FA8" opacity=".65"/><circle cx="69" cy="63" r="4.5" fill="#FF9FA8" opacity=".65"/><path d="M41 65 Q50 74 59 65" fill="none" stroke="#B5523B" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="5" r="4" fill="#FF2E6E"/><path d="M50 93l1.8 3.8 4.2.5-3 2.9.8 4.1-3.8-2-3.8 2 .8-4.1-3-2.9 4.2-.5z" fill="#F5B700"/></svg>',
+pup:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-pup" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#7FD6FF"/><stop offset="1" stop-color="#2F9BF0"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-pup)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><ellipse cx="21" cy="46" rx="12" ry="23" fill="#8A4B22" transform="rotate(-14 21 46)"/><ellipse cx="79" cy="46" rx="12" ry="23" fill="#8A4B22" transform="rotate(14 79 46)"/><circle cx="50" cy="54" r="34" fill="#FFC978"/><ellipse cx="37" cy="48" rx="11" ry="12" fill="#E8893A"/><ellipse cx="50" cy="69" rx="17" ry="13" fill="#FFF4E6"/><path d="M46 76 Q50 88 54 76Z" fill="#F27A9B"/><ellipse cx="50" cy="63" rx="6" ry="4.5" fill="#3A2A2A"/><path d="M50 67 V72 M42 72 Q46 77 50 72 Q54 77 58 72" fill="none" stroke="#3A2A2A" stroke-width="2.5" stroke-linecap="round"/><circle cx="38" cy="48" r="5" fill="#2B2B4A"/><circle cx="39.6" cy="46.2" r="1.7" fill="#fff"/><circle cx="62" cy="48" r="5" fill="#2B2B4A"/><circle cx="63.6" cy="46.2" r="1.7" fill="#fff"/><path d="M22 31 Q50 0 78 31 Q50 21 22 31Z" fill="#FF2E6E"/><circle cx="50" cy="19" r="5.5" fill="#F5B700"/></svg>',
+mira:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-mira" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#7FF0D2"/><stop offset="1" stop-color="#16B892"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-mira)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><path d="M22 42 Q16 82 30 94 L37 62 H63 L70 94 Q84 82 78 42Z" fill="#FF7A1A"/><circle cx="50" cy="58" r="25" fill="#FFD9B8"/><path d="M25 54 Q30 35 50 38 Q70 35 75 54 Q62 43 50 46 Q38 43 25 54Z" fill="#FF7A1A"/><circle cx="41" cy="60" r="4.6" fill="#2B2B4A"/><circle cx="42.6" cy="58.2" r="1.6" fill="#fff"/><circle cx="59" cy="60" r="4.6" fill="#2B2B4A"/><circle cx="60.6" cy="58.2" r="1.6" fill="#fff"/><circle cx="31" cy="69" r="4.5" fill="#FF9FA8" opacity=".65"/><circle cx="69" cy="69" r="4.5" fill="#FF9FA8" opacity=".65"/><path d="M42 71 Q50 79 58 71" fill="none" stroke="#B5523B" stroke-width="3" stroke-linecap="round"/><path d="M50 0 L73 35 H27Z" fill="#7A3DF0"/><ellipse cx="50" cy="35" rx="35" ry="7" fill="#5A22C8"/><path d="M52 14l2 4.4 4.8.5-3.6 3.2 1 4.7-4.2-2.4-4.2 2.4 1-4.7-3.6-3.2 4.8-.5z" fill="#F5B700"/></svg>',
+bot:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-bot" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#FFE873"/><stop offset="1" stop-color="#F5B400"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-bot)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><path d="M50 16 V5" stroke="#1E78C8" stroke-width="3"/><circle cx="50" cy="5" r="4.5" fill="#F5B700"/><rect x="7" y="36" width="12" height="18" rx="4" fill="#1E78C8"/><rect x="81" y="36" width="12" height="18" rx="4" fill="#1E78C8"/><rect x="17" y="16" width="66" height="58" rx="16" fill="#7FDCFF" stroke="#1E78C8" stroke-width="3"/><rect x="26" y="28" width="48" height="23" rx="11.5" fill="#1F2A44"/><circle cx="40" cy="39.5" r="6" fill="#7EF0D0"/><circle cx="60" cy="39.5" r="6" fill="#7EF0D0"/><path d="M38 60 Q50 69 62 60" fill="none" stroke="#1E78C8" stroke-width="3.5" stroke-linecap="round"/><rect x="38" y="74" width="24" height="8" fill="#1E78C8"/><rect x="24" y="81" width="52" height="19" rx="8" fill="#7FDCFF" stroke="#1E78C8" stroke-width="3"/><circle cx="50" cy="91" r="4" fill="#FF2E6E"/></svg>',
+dragon:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-dragon" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#D7B0FF"/><stop offset="1" stop-color="#9B5DE5"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-dragon)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><path d="M24 52 L2 30 L9 58 L2 72 L26 68Z" fill="#FF9F1C"/><path d="M76 52 L98 30 L91 58 L98 72 L74 68Z" fill="#FF9F1C"/><path d="M34 30 L29 9 L45 25Z M66 30 L71 9 L55 25Z" fill="#FFF1C9"/><path d="M45 26 L50 12 L55 26Z" fill="#F5B700"/><circle cx="50" cy="56" r="31" fill="#35C96B"/><ellipse cx="50" cy="71" rx="17" ry="12" fill="#A8F5B5"/><circle cx="45" cy="68" r="1.9" fill="#2F6B49"/><circle cx="55" cy="68" r="1.9" fill="#2F6B49"/><circle cx="38" cy="49" r="8" fill="#fff"/><circle cx="62" cy="49" r="8" fill="#fff"/><circle cx="39" cy="50" r="4" fill="#2B2B4A"/><circle cx="40.6" cy="48.2" r="1.4" fill="#fff"/><circle cx="61" cy="50" r="4" fill="#2B2B4A"/><circle cx="62.6" cy="48.2" r="1.4" fill="#fff"/><path d="M41 76 Q50 83 59 76" fill="none" stroke="#2F6B49" stroke-width="2.6" stroke-linecap="round"/></svg>',
+fox:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-fox" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#B6F08A"/><stop offset="1" stop-color="#4FBF4A"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-fox)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><path d="M20 40 L20 5 L46 26Z M80 40 L80 5 L54 26Z" fill="#FF7A1A"/><path d="M25 32 L25 15 L38 26Z M75 32 L75 15 L62 26Z" fill="#FFD9C2"/><path d="M16 46 Q50 18 84 46 Q78 78 50 93 Q22 78 16 46Z" fill="#FF7A1A"/><path d="M16 47 Q38 56 50 93 Q22 78 16 47Z M84 47 Q62 56 50 93 Q78 78 84 47Z" fill="#FFF4E6"/><ellipse cx="50" cy="86" rx="5.5" ry="4.2" fill="#3A2A2A"/><circle cx="38" cy="54" r="4.6" fill="#2B2B4A"/><circle cx="39.6" cy="52.2" r="1.6" fill="#fff"/><circle cx="62" cy="54" r="4.6" fill="#2B2B4A"/><circle cx="63.6" cy="52.2" r="1.6" fill="#fff"/></svg>'};
+var HEROES=[
+ {id:'tim',name:'Тим',emoji:ART.tim,role:'ғарыш ұшқышы',item:'жұлдыз',icon:'⭐'},
+ {id:'toqash',name:'Тоқаш',emoji:ART.pup,role:'құтқарушы күшік',item:'сүйек',icon:'🦴'},
+ {id:'mira',name:'Мира',emoji:ART.mira,role:'жас сиқыршы',item:'жидек',icon:'🍓'},
+ {id:'boltik',name:'Болтик',emoji:ART.bot,role:'өнертапқыш робот',item:'сомын',icon:'🔩'},
+ {id:'ushqyn',name:'Ұшқын',emoji:ART.dragon,role:'мейірімді айдаһар',item:'кристалл',icon:'💎'},
+ {id:'zhiren',name:'Жирен',emoji:ART.fox,role:'ізшіл түлкі',item:'жаңғақ',icon:'🌰'}
+];
+var OWN_EMOJI=['🦸','🦊','🐱','🦄','🐉','🧚','⚽','🚗'];
+var PRAISE=['Дұрыс!','Жарайсың!','Керемет!','Өте жақсы!','Тамаша!'];
+var PER_T=10;
+
+var S={hero:null,book:{},done:{},club:{}};
+try{var raw=localStorage.getItem(KEY);if(raw){var d=JSON.parse(raw);if(d&&typeof d==='object'){S.hero=d.hero||null;S.book=d.book||{};S.done=d.done||{};S.club=d.club||{};}}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+try{speechSynthesis.getVoices();}catch(e){}
+
+function rnd(a,b){return a+Math.floor(RNG()*(b-a+1));}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function dots(n,cls){var s='';for(var i=0;i<n;i++)s+='<span class="dot '+(cls||'')+'"></span>';return s;}
+function row(html){return '<div class="dots">'+html+'</div>';}
+function numOpts(ans,min,max,step){
+  var set=[ans],tries=0;
+  while(set.length<4&&tries<200){tries++;var v=ans+rnd(-3,3)*(step||1);if(v>=min&&v<=max&&set.indexOf(v)<0)set.push(v);}
+  set.sort(function(a,b){return a-b;});
+  return set.map(function(v){return {v:v,label:String(v)};});
+}
+function seeded(seed){return function(){seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hero(){
+  var h=S.hero||{};
+  var base=HEROES.filter(function(x){return x.id===h.id;})[0];
+  if(base)return base;
+  return {id:'own',name:h.name||'Кейіпкер',emoji:h.emoji||'🦸',role:'',item:'алма',icon:'🍎'};
+}
+var Q='<span class="q">?</span>';
+function E(a){return a.map(function(x){return x===null?Q:'<span>'+x+'</span>';}).join('');}
+function T(text,big,ans,hint,o){o=o||{};return {text:text,big:big,ans:ans,hint:hint,words:o.words,opts:o.opts||numOpts(ans,o.min||0,o.max===undefined?1000:o.max,o.step)};}
+function ex(t){return '<div class="ex">'+t+'</div>';}
+function numbered(n,icon){var r='<div class="cnt">';for(var i=1;i<=n;i++)r+='<span>'+icon+'<b>'+i+'</b></span>';return r+'</div>';}
+var CMP_OPTS=function(){return [{v:'>',label:'&gt;<small>үлкен</small>'},{v:'<',label:'&lt;<small>кіші</small>'},{v:'=',label:'=<small>тең</small>'}];};
+var EX='Мысалды шығар';
+
+/* ---------- тапсырмалар ---------- */
+var THINGS=[['🍎','алма'],['⚽','доп'],['🌼','гүл'],['🐟','балық'],['🎈','шар'],['🍄','саңырауқұлақ']];
+var SHAPES=[['дөңгелек','●',0],['үшбұрыш','▲',3],['шаршы','■',4],['тіктөртбұрыш','▬',4]];
+var G={
+ count:function(h){
+  var n=rnd(1,10),w=rnd(0,THINGS.length),ic=w<THINGS.length?THINGS[w][0]:h.icon,nm=w<THINGS.length?THINGS[w][1]:h.item,pics='';
+  for(var i=0;i<n;i++)pics+='<span>'+ic+'</span>';
+  return {text:'Мұнда неше '+nm+' бар?',big:pics,pics:true,opts:numOpts(n,1,10),ans:n,
+    hint:'Әр затты саусағыңмен көрсетіп, дауыстап сана: бір, екі, үш…'};},
+ neigh:function(){var n=rnd(1,19),k=rnd(1,3);
+  if(k===1)return T(n+' санынан кейін қандай сан келеді?',E([n,null]),n+1,'Келесі сан 1-ге артық: '+n+' + 1.',{max:20});
+  if(k===2)return T(n+' санының алдында қандай сан тұр?',E([null,n]),n-1,'Алдыңғы сан 1-ге кем: '+n+' − 1.',{max:20});
+  return T((n-1)+' және '+(n+1)+' сандарының арасында қандай сан тұр?',E([n-1,null,n+1]),n,'Бұл сан '+(n-1)+' санынан 1-ге артық.',{max:20});},
+ miss:function(){var up=RNG()<.6,st=rnd(1,16),k=rnd(1,3),seq=[],i,ans;
+  for(i=0;i<5;i++)seq.push(up?st+i:st+4-i);ans=seq[k];seq[k]=null;
+  return T('Қай сан түсіп қалған?',E(seq),ans,'Сандар ретімен тұр. Әр келесі сан 1-ге '+(up?'артық':'кем')+'.',{max:20});},
+ cmp:function(){
+  var a=rnd(0,10),b=RNG()<.25?a:rnd(0,10),ans=a>b?'>':a<b?'<':'=';
+  return {text:'Қандай таңба қою керек?',big:E([a,null,b]),three:true,opts:CMP_OPTS(),ans:ans,
+    hint:'Дөңгелектер қатарын салыстыр. Қай қатарда дөңгелек көп болса, сол сан үлкен.'+row(dots(a)||'<span>бос</span>')+row(dots(b,'b')||'<span>бос</span>')};},
+ zero:function(){var a=rnd(1,20),k=rnd(1,4),h='Нөл — «ештеңе жоқ» деген сөз. Нөлді қоссаң да, азайтсаң да сан өзгермейді. Санды өзінен азайтсаң, нөл қалады.';
+  if(k===1)return T(EX,E([a,'+',0,'=',null]),a,h,{max:20});
+  if(k===2)return T(EX,E([0,'+',a,'=',null]),a,h,{max:20});
+  if(k===3)return T(EX,E([a,'−',0,'=',null]),a,h,{max:20});
+  return T(EX,E([a,'−',a,'=',null]),0,h,{max:20});},
+ comp:function(){var n=rnd(3,10),a=rnd(1,n-1);
+  return T(n+' саны қандай сандардан тұрады?',E([n,'—',a,'және',null]),n-a,
+    'Барлығы '+n+' дөңгелек. '+a+' дөңгелек боялған. Боялмағаны нешеу?'+row(dots(a)+dots(n-a,'e')),{max:10});},
+ plus123:function(){var a=rnd(1,9),b=rnd(1,3),i,ch=[a];
+  if(a+b<=10&&(RNG()<.5||a-b<0)){for(i=1;i<=b;i++)ch.push(a+i);
+   return T(EX,E([a,'+',b,'=',null]),a+b,'Бір-бірден қос: '+ch.join(', ')+'.',{max:10});}
+  if(a-b<0)b=a;ch=[a];for(i=1;i<=b;i++)ch.push(a-i);
+  return T(EX,E([a,'−',b,'=',null]),a-b,'Бір-бірден азайт: '+ch.join(', ')+'.',{max:10});},
+ calc:function(){var a,b;
+  if(RNG()<.5){a=rnd(1,9);b=rnd(1,10-a);return T(EX,E([a,'+',b,'=',null]),a+b,'Барлық дөңгелекті бірге сана.'+row(dots(a)+dots(b,'b')),{max:10});}
+  a=rnd(2,10);b=rnd(1,a);return T(EX,E([a,'−',b,'=',null]),a-b,'Барлығы '+a+' дөңгелек болды. Сызылғандары алынып тасталды. Нешеуі қалды?'+row(dots(a-b)+dots(b,'x')),{max:10});},
+ names:function(){var k=rnd(1,4),a,b;
+  if(k<=2){a=rnd(1,8);b=rnd(1,9-a);
+   return T(k===1?a+' және '+b+' сандарының қосындысын тап.':'Бірінші қосылғыш '+a+', екінші қосылғыш '+b+'. Қосынды нешеге тең?',E([null]),a+b,'Қосынды — қосудың нәтижесі: '+a+' + '+b+'.',{max:10});}
+  a=rnd(3,10);b=rnd(1,a-1);
+  return T(k===3?a+' және '+b+' сандарының айырмасын тап.':'Азайғыш '+a+', азайтқыш '+b+'. Айырма нешеге тең?',E([null]),a-b,'Айырма — азайтудың нәтижесі: '+a+' − '+b+'.',{max:10});},
+ unk:function(){var k=rnd(1,4),a,b,c,t='Жасырын санды тап';
+  if(k<=2){a=rnd(1,8);b=rnd(1,9-a);c=a+b;
+   return k===1?T(t,E([null,'+',b,'=',c]),a,'Қосындыдан белгілі қосылғышты азайтамыз: '+c+' − '+b+'.',{max:10})
+    :T(t,E([a,'+',null,'=',c]),b,'Қосындыдан белгілі қосылғышты азайтамыз: '+c+' − '+a+'.',{max:10});}
+  a=rnd(3,10);b=rnd(1,a-1);c=a-b;
+  return k===3?T(t,E([null,'−',b,'=',c]),a,'Айырма мен азайтқышты қосамыз: '+c+' + '+b+'.',{max:10})
+   :T(t,E([a,'−',null,'=',c]),b,'Азайғыштан айырманы азайтамыз: '+a+' − '+c+'.',{max:10});},
+ incdec:function(){var a,b;
+  if(RNG()<.5){a=rnd(1,8);b=rnd(1,10-a);return T(a+' санын '+b+' бірлікке арттыр.',E([null]),a+b,'Арттыру — қосу деген сөз: '+a+' + '+b+'.',{max:10});}
+  a=rnd(2,10);b=rnd(1,a);return T(a+' санын '+b+' бірлікке кеміт.',E([null]),a-b,'Кеміту — азайту деген сөз: '+a+' − '+b+'.',{max:10});},
+ diffcmp:function(){var a=rnd(2,10),b=rnd(1,a-1);
+  return T(RNG()<.5?a+' саны '+b+' санынан нешеге артық?':b+' саны '+a+' санынан нешеге кем?',E([a,'және',b]),a-b,
+   'Үлкен саннан кіші санды азайтамыз: '+a+' − '+b+'.'+row(dots(a))+row(dots(b,'b')),{max:10});},
+ cmpexpr:function(){var plusOp=RNG()<.5,a,b,r,c,ans;
+  if(plusOp){a=rnd(1,8);b=rnd(1,9-a);r=a+b;}else{a=rnd(2,10);b=rnd(1,a);r=a-b;}
+  c=Math.min(10,Math.max(0,r+rnd(-2,2)));ans=r>c?'>':r<c?'<':'=';
+  return {text:'Мысал мен санды салыстыр. Қандай таңба қою керек?',big:E([a,plusOp?'+':'−',b,null,c]),three:true,ans:ans,opts:CMP_OPTS(),
+   hint:'Алдымен мысалды шығар: '+a+(plusOp?' + ':' − ')+b+' = '+r+'. Енді '+r+' және '+c+' сандарын салыстыр.'};},
+ word:function(h){
+  var N=h.name,f=h.item,k=rnd(1,5),a,b,text,ans,hint;
+  if(k===1){a=rnd(2,7);b=rnd(1,10-a);ans=a+b;
+    text=N+' '+a+' '+f+' тапты, содан кейін тағы '+b+' '+f+' тапты. Барлығы неше '+f+' болды?';
+    hint='Көбейді, сондықтан қосамыз: '+a+' + '+b+'.';}
+  else if(k===2){a=rnd(3,10);b=rnd(1,a-1);ans=a-b;
+    text=N+' '+a+' '+f+' алып келе жатты. Оның '+b+' данасын достарына сыйлады. Неше '+f+' қалды?';
+    hint='Азайды, сондықтан азайтамыз: '+a+' − '+b+'.';}
+  else if(k===3){a=rnd(2,7);b=rnd(1,10-a);ans=a+b;
+    text=N+' '+a+' '+f+' тапты, ал досы одан '+b+' '+f+' артық тапты. Досы неше '+f+' тапты?';
+    hint='«Артық» дегенде қосамыз: '+a+' + '+b+'.';}
+  else if(k===4){a=rnd(3,10);b=rnd(1,a-1);ans=a-b;
+    text=N+' '+a+' '+f+' тапты, ал досы одан '+b+' '+f+' кем тапты. Досы неше '+f+' тапты?';
+    hint='«Кем» дегенде азайтамыз: '+a+' − '+b+'.';}
+  else{a=rnd(3,10);b=rnd(1,a-1);ans=a-b;
+    text=N+' '+a+' '+f+' тапты, ал досы '+b+' '+f+' тапты. '+N+' досынан неше '+f+' артық тапты?';
+    hint='Бір сан екіншісінен нешеге артық екенін білу үшін үлкен саннан кіші санды азайтамыз: '+a+' − '+b+'.';}
+  return {text:text,big:E([h.icon,null]),opts:numOpts(ans,0,10),ans:ans,hint:hint};},
+ shapes:function(){var f=SHAPES[rnd(0,3)],k=rnd(1,5),c,n,m,arr=[],i;
+  if(k===1)return T('Бұл фигура қалай аталады?',E([f[1]]),f[0],'Бұрыштарын сана. Бұрышы жоқ — дөңгелек. Үш бұрыш — үшбұрыш. Төрт бұрыш: барлық қабырғасы тең болса — шаршы, әйтпесе тіктөртбұрыш.',
+    {words:true,opts:SHAPES.map(function(x){return {v:x[0],label:x[0]};})});
+  if(k===2)return T('Бұл фигураның неше бұрышы бар?',E([f[1]]),f[2],'Бұрыш — екі қабырға түйісетін жер. Әр бұрышты саусағыңмен көрсетіп сана.',
+    {opts:[0,3,4,5].map(function(v){return {v:v,label:String(v)};})});
+  c=rnd(0,2);n=rnd(1,5);m=rnd(2,4);
+  for(i=0;i<n;i++)arr.push([RNG(),SHAPES[c][1]]);
+  for(i=0;i<m;i++)arr.push([RNG(),SHAPES[(c+1+i%2)%3][1]]);
+  arr.sort(function(x,y){return x[0]-y[0];});
+  return T('Мұнда неше '+SHAPES[c][0]+' бар?',E(arr.map(function(x){return x[1];})),n,'Тек керекті фигураларды сана, қалғандарын өткізіп жібер.',{min:1,max:9});},
+ cm:function(){var k=rnd(1,3),a,b;
+  if(k===1){a=rnd(1,8);b=rnd(1,10-a);return T('Кесінділердің ұзындықтарын қос',E([a+' см','+',b+' см','=',null,'см']),a+b,'Сантиметрлерді жай сандар сияқты қосамыз: '+a+' + '+b+'.',{max:20});}
+  if(k===2){a=rnd(3,10);b=rnd(1,a-1);return T('Бір кесінді екіншісінен нешеге ұзын?',E([a+' см','−',b+' см','=',null,'см']),a-b,'Үлкен ұзындықтан кішісін азайтамыз: '+a+' − '+b+'.',{max:20});}
+  a=rnd(1,9);return T('Бұл неше сантиметр?',E(['1 дм '+a+' см','=',null,'см']),10+a,'1 дециметр — 10 сантиметр. 10 + '+a+'.',{max:20});},
+ teen:function(){var k=rnd(1,3),a,b,r;
+  if(k===1){a=rnd(1,10);return T(EX,E([10,'+',a,'=',null]),10+a,'1 ондық және '+a+' бірлік. Бұл қандай сан?'+row(dots(10))+row(dots(a,'b')),{max:20});}
+  if(k===2){a=rnd(6,9);b=rnd(11-a,9);r=10-a;
+   return T(EX,E([a,'+',b,'=',null]),a+b,'Алдымен онға дейін толықтыр: '+a+' + '+r+' = 10. Содан кейін қалғанын қос: 10 + '+(b-r)+'.',{max:20});}
+  a=rnd(11,18);b=rnd(2,9);r=a-10;
+  return T(EX,E([a,'−',b,'=',null]),a-b,b>r?('Алдымен онға дейін азайт: '+a+' − '+r+' = 10. Содан кейін қалғанын азайт: 10 − '+(b-r)+'.')
+    :(a+' санында 1 ондық және '+r+' бірлік бар. Бірліктерден '+b+' санын азайт.'),{max:20});},
+ tens:function(){var a,b;
+  if(RNG()<.5){a=rnd(1,8);b=rnd(1,10-a);return T(EX,E([a*10,'+',b*10,'=',null]),(a+b)*10,a+' ондық және тағы '+b+' ондық. Барлығы неше ондық?',{max:100,step:10});}
+  a=rnd(2,10);b=rnd(1,a-1);return T(EX,E([a*10,'−',b*10,'=',null]),(a-b)*10,'Ондықтармен сана: '+a+' − '+b+' = '+(a-b)+'. Жауабында сонша ондық болады.',{max:100,step:10});},
+ place:function(){var d=rnd(1,9),u=rnd(1,9),n=d*10+u,k=rnd(1,3);
+  if(k===1)return T(n+' санында неше ондық бар?',E([n]),d,'Екі таңбалы санның бірінші цифры ондықтарды көрсетеді.',{max:9});
+  if(k===2)return T(n+' санында неше бірлік бар?',E([n]),u,'Екі таңбалы санның екінші цифры бірліктерді көрсетеді.',{max:9});
+  return T(d+' ондық және '+u+' бірлік — бұл қандай сан?',E([d*10,'+',u,'=',null]),n,'Алдымен ондықтарды, содан кейін бірліктерді жаз.',{max:99});},
+ add100s:function(){var d=rnd(2,8),u=rnd(1,8),a=d*10+u,k=rnd(1,4),b;
+  if(k===1){b=rnd(1,9-u);return T(EX,E([a,'+',b,'=',null]),a+b,'Ондықтар өзгермейді. Бірліктерді қос: '+u+' + '+b+'.',{max:99});}
+  if(k===2){b=rnd(1,9-d)*10;return T(EX,E([a,'+',b,'=',null]),a+b,'Бірліктер өзгермейді. Ондықтарды қос: '+d*10+' + '+b+'.',{max:99,step:10});}
+  if(k===3){b=rnd(1,u);return T(EX,E([a,'−',b,'=',null]),a-b,'Ондықтар өзгермейді. Бірліктерден азайт: '+u+' − '+b+'.',{max:99});}
+  b=rnd(1,d-1)*10;return T(EX,E([a,'−',b,'=',null]),a-b,'Бірліктер өзгермейді. Ондықтардан азайт: '+d*10+' − '+b+'.',{max:99,step:10});}
+};
+
+/* ---------- тақырыптар мен сабақтар ---------- */
+var DATA=[
+ ['count','Онға дейін санаймыз','Неше зат бар?',function(h){return [
+  ['Сандар заттардың нешеу екенін білуге көмектеседі. Кел, бірге санайық!',numbered(5,h.icon)],
+  ['Ретімен сана, ештеңені өткізіп алма. Соңғы айтқан саның — жауап.',numbered(7,h.icon)+'<p>Мұнда 7 '+h.item+' бар.</p>'],
+  ['Әр саннан кейін келесі сан келеді. Ол 1-ге артық.',ex('1 2 3 4 5 6 7 8 9 10')+'<p>6-дан кейін 7 келеді. 6-ның алдында 5 тұр.</p>']];}],
+ ['neigh','Санның көршілері','Алдыңғы және келесі сан',[
+  ['Әр санның көршілері бар. Сол жақтағы көршісі 1-ге кем, оң жақтағы көршісі 1-ге артық.',ex('4 5 6')+'<p>5 санының көршілері — 4 және 6.</p>'],
+  ['Келесі санды табу үшін 1-ді қос. Алдыңғы санды табу үшін 1-ді азайт.',ex('7 + 1 = 8')+ex('7 − 1 = 6')]]],
+ ['miss','Сандар ретімен','Түсіп қалған санды табамыз',[
+  ['Сандар жіпке тізілген моншақтай ретімен тұрады.',ex('1 2 3 4 5 6 7 8 9 10')],
+  ['Кері қарай да санауға болады. Сонда әр сан 1-ге кем болады.',ex('9 8 7 6 5')]]],
+ ['cmp','Үлкен, кіші, тең','Сандарды салыстырамыз',[
+  ['Сандарды салыстыру — қайсысы үлкен, қайсысы кіші екенін білу.',row(dots(5))+row(dots(3,'b'))+'<p>Бірінші қатарда дөңгелек көп. Демек, 5 саны 3-тен үлкен.</p>'],
+  ['«Үлкен» және «кіші» таңбалары құстың тұмсығына ұқсайды. Тұмсық әрқашан үлкен санға қарай ашылады.',ex('7 &gt; 4')+'<p>жеті төрттен үлкен</p>'+ex('2 &lt; 6')+'<p>екі алтыдан кіші</p>'],
+  ['Заттар тең болса, сандар да тең. Сонда «тең» таңбасын қоямыз.',row(dots(4))+row(dots(4,'b'))+ex('4 = 4')]]],
+ ['zero','Нөл саны','Ештеңе жоқ болғанда',[
+  ['Нөл бірде-бір зат жоқ екенін білдіреді.',row(dots(3,'x'))+ex('3 − 3 = 0')],
+  ['Нөлді қоссаң да, азайтсаң да сан өзгермейді.',ex('5 + 0 = 5')+ex('5 − 0 = 5')]]],
+ ['comp','Санның құрамы','Сан қандай сандардан тұрады',[
+  ['Кез келген санды екі кіші саннан құрауға болады.',row(dots(2)+dots(3,'b'))+ex('5 — бұл 2 және 3')],
+  ['Бір санды әртүрлі жолмен құрауға болады.',row(dots(1)+dots(4,'b'))+'<p>5 — бұл 1 және 4</p>'+row(dots(3)+dots(2,'b'))+'<p>5 — бұл 3 және 2</p>'],
+  ['Санның құрамын білген бала мысалдарды тез шығарады.',ex('6 — бұл 4 және 2')+'<p>Демек:</p>'+ex('4 + 2 = 6')+ex('6 − 2 = 4')]]],
+ ['plus123','1, 2 және 3-ті қосамыз','Қадамдап санаймыз',[
+  ['1-ді қосу — келесі санды атау. 1-ді азайту — алдыңғы санды атау.',ex('6 + 1 = 7')+ex('6 − 1 = 5')],
+  ['2 немесе 3-ті бір-бірден қосуға болады.',ex('5 + 3')+'<p>5, содан кейін 6, 7, 8</p>'+ex('5 + 3 = 8')]]],
+ ['calc','10 көлемінде қосу мен азайту','Мысалдар шығарамыз',[
+  ['Қосу — бірге жинау. «Плюс» таңбасын жазамыз.',row(dots(3)+dots(2,'b'))+ex('3 + 2 = 5')],
+  ['Азайту — бір бөлігін алып тастау. «Минус» таңбасын жазамыз.',row(dots(3)+dots(2,'x'))+ex('5 − 2 = 3')],
+  ['Қосқанда сандардың орнын ауыстыруға болады, жауап өзгермейді. Үлкен санға кіші санды қосқан ыңғайлы.',ex('2 + 7 = 9')+ex('7 + 2 = 9')]]],
+ ['names','Қосынды мен айырма','Мысалдағы сандардың аттары',[
+  ['Қосылатын сандар қосылғыштар деп аталады. Қосудың нәтижесі — қосынды.',ex('3 + 4 = 7')+'<p>3 және 4 — қосылғыштар, 7 — қосынды</p>'],
+  ['Азайтуда сандар былай аталады: азайғыш, азайтқыш және айырма.',ex('9 − 2 = 7')+'<p>9 — азайғыш, 2 — азайтқыш, 7 — айырма</p>']]],
+ ['unk','Жасырын сан','Мысалдағы белгісізді табамыз',[
+  ['Кейде мысалда сан жасырылады. Ол қосылғыш болса, қосындыдан белгілі қосылғышты азайтамыз.',ex('? + 3 = 7')+'<p>7 − 3 = 4</p>'],
+  ['Азайтқыш жасырылса, азайғыштан айырманы азайтамыз. Азайғыш жасырылса, қосамыз.',ex('9 − ? = 6')+'<p>9 − 6 = 3</p>'+ex('? − 2 = 5')+'<p>5 + 2 = 7</p>']]],
+ ['incdec','Арттыру және кеміту','Бірнеше бірлікке',[
+  ['Санды арттыру — оны үлкейту, яғни қосу.',ex('5-ті 2-ге арттыр')+ex('5 + 2 = 7')],
+  ['Санды кеміту — оны кішірейту, яғни азайту.',ex('5-ті 2-ге кеміт')+ex('5 − 2 = 3')]]],
+ ['diffcmp','Нешеге артық','Азайту арқылы салыстырамыз',[
+  ['Бір сан екіншісінен нешеге артық екенін білу үшін үлкен саннан кіші санды азайтамыз.',row(dots(7))+row(dots(4,'b'))+ex('7 − 4 = 3')],
+  ['Бір сан нешеге артық болса, екіншісі соншаға кем.','<p>7 саны 4-тен 3-ке артық.</p><p>4 саны 7-ден 3-ке кем.</p>']]],
+ ['cmpexpr','Мысал мен санды салыстыр','Алдымен шығар, содан кейін салыстыр',[
+  ['Мысал мен санды салыстыру үшін алдымен мысалды шығар.',ex('3 + 4 ? 8')+'<p>3 + 4 = 7, ал 7 саны 8-ден кіші</p>'+ex('3 + 4 &lt; 8')],
+  ['Кейде тең шығады. Сонда «тең» таңбасын қоямыз.',ex('9 − 2 = 7')]]],
+ ['word','Кейіпкермен есептер','Оқимыз және шығарамыз',function(h){var f=h.item;return [
+  ['Есепте шарт пен сұрақ болады. Шарт — белгілі нәрсе. Сұрақ — табу керек нәрсе.',
+   '<p><strong>Шарты.</strong> '+esc(h.name)+' 4 '+f+' тапты, содан кейін тағы 2 '+f+' тапты.</p><p><strong>Сұрағы.</strong> Барлығы неше '+f+' болды?</p>'],
+  ['Бірге жинап, көбейсе — қосамыз. Алып тастап, азайса — азайтамыз.','<p>тағы тапты, әкелді, қосты</p>'+ex('+')+'<p>берді, сыйлады, жоғалтты</p>'+ex('−')],
+  ['«2-ге артық» дегенде 2-ні қосамыз. «2-ге кем» дегенде 2-ні азайтамыз.','<p>5-тен 2-ге артық</p>'+ex('5 + 2')+'<p>5-тен 2-ге кем</p>'+ex('5 − 2')],
+  ['Бір сан екіншісінен нешеге артық екенін білу үшін үлкен саннан кіші санды азайтамыз.',row(dots(6))+row(dots(4,'b'))+ex('6 − 4 = 2')+'<p>6 саны 4-тен 2-ге артық.</p>']];}],
+ ['shapes','Фигуралар','Дөңгелек, үшбұрыш, шаршы',[
+  ['Дөңгелектің бұрышы жоқ. Үшбұрыштың үш бұрышы және үш қабырғасы бар.',ex('● ▲')],
+  ['Шаршы мен тіктөртбұрыштың төрт-төрттен бұрышы бар. Шаршының барлық қабырғасы тең.',ex('■ ▬')]]],
+ ['cm','Сантиметр','Ұзындықты өлшейміз',[
+  ['Ұзындықты сызғышпен өлшейді. Кішкентай өлшем сантиметр деп аталады.',ex('1 см')+'<p>Бұл шамамен саусағыңның еніндей.</p>'],
+  ['Он сантиметр — бір дециметр.',ex('10 см = 1 дм')+ex('1 дм 3 см = 13 см')]]],
+ ['teen','20-ға дейінгі сандар','Ондық пен бірліктер',[
+  ['Он бірлік — бір ондық.',row(dots(10))+ex('10 бірлік = 1 ондық')],
+  ['11-ден 20-ға дейінгі сандар — бір ондық және бірнеше бірлік.',row(dots(10))+row(dots(3,'b'))+ex('13 — бұл 10 және 3')],
+  ['Бөліктеп қосамыз: алдымен онға дейін толықтырамыз, содан кейін қалғанын қосамыз.',ex('8 + 5')+'<p>5 — бұл 2 және 3</p>'+ex('8 + 2 = 10')+ex('10 + 3 = 13')],
+  ['Азайтуды да бөліктеп орындаймыз: алдымен онға дейін, содан кейін қалғанын.',ex('13 − 5')+'<p>5 — бұл 3 және 2</p>'+ex('13 − 3 = 10')+ex('10 − 2 = 8')]]],
+ ['tens','Ондықтармен санау','100-ге дейінгі дөңгелек сандар',[
+  ['Ондықтарды бірліктер сияқты санайды.',ex('2 + 3 = 5')+ex('20 + 30 = 50')],
+  ['Он ондық — жүз.',ex('10 20 30 … 90 100')]]],
+ ['place','Ондықтар мен бірліктер','Екі таңбалы сан қалай құралған',[
+  ['Екі таңбалы санда бірінші цифр ондықтарды, екінші цифр бірліктерді көрсетеді.',ex('47')+'<p>4 ондық және 7 бірлік</p>'],
+  ['Кез келген екі таңбалы санды ондықтар мен бірліктерге жіктеуге болады.',ex('47 = 40 + 7')]]],
+ ['add100s','100 көлемінде қосу мен азайту','Ондықтан аттамай',[
+  ['Бірліктерді бірліктерге қосамыз, ондықтар өзгермейді.',ex('34 + 5 = 39')+ex('57 − 4 = 53')],
+  ['Ондықтарды ондықтарға қосамыз, бірліктер өзгермейді.',ex('34 + 20 = 54')+ex('57 − 30 = 27')]]]
+];
+var TOPICS=[],LESSONS={};
+DATA.forEach(function(m){
+  TOPICS.push({id:m[0],title:m[1],sub:m[2],gen:G[m[0]]});
+  LESSONS[m[0]]=function(h){var a=typeof m[3]==='function'?m[3](h):m[3];return a.map(function(x){return {text:x[0],vis:x[1]};});};
+});
+
+/* ---------- дауыс ---------- */
+function kkVoice(){try{var v=speechSynthesis.getVoices();for(var i=0;i<v.length;i++)if(/^kk/i.test(v[i].lang))return v[i];}catch(e){}return null;}
+function speak(text,onend){var v=kkVoice();if(!v)return false;
+  try{var u=new SpeechSynthesisUtterance(text);u.voice=v;u.lang=v.lang;u.rate=.9;if(onend){u.onend=onend;u.onerror=onend;}speechSynthesis.cancel();speechSynthesis.speak(u);return true;}catch(e){return false;}}
+var TOKEN=0;
+function halt(){TOKEN++;try{speechSynthesis.cancel();}catch(e){}}
+
+/* ---------- экрандар ---------- */
+function cnt(id){return Object.keys(S.done[id]||{}).length;}
+function showHeroes(){
+  var own={name:'',emoji:OWN_EMOJI[0]};
+  var h='<h1>Қызықты математика әлеміне саяхат</h1><p>Есептерді кіммен бірге шығаратыныңды таңда.</p><div class="heroes">';
+  HEROES.forEach(function(x){
+    h+='<button class="btn hero" data-id="'+x.id+'"><span class="em">'+x.emoji+'</span><span class="nm">'+x.name+'</span><span class="rl">'+x.role+'</span></button>';
+  });
+  h+='</div><div class="own"><h2>Немесе өз кейіпкеріңді шақыр</h2><p><label for="nm">Сүйікті кейіпкеріңнің аты кім?</label></p>'+
+     '<input id="nm" maxlength="14" autocomplete="off" placeholder="Кейіпкердің аты">'+
+     '<div class="pick" role="group" aria-label="Кейіпкердің белгісі">';
+  OWN_EMOJI.forEach(function(e,i){h+='<button class="btn plain" data-em="'+e+'" aria-pressed="'+(i===0)+'">'+e+'</button>';});
+  h+='</div><button class="btn main" id="go" disabled>Осы кейіпкермен ойнау</button></div>';
+  app.innerHTML=h;
+  var inp=document.getElementById('nm'),go=document.getElementById('go');
+  inp.addEventListener('input',function(){own.name=inp.value.trim();go.disabled=!own.name;});
+  app.querySelectorAll('[data-id]').forEach(function(b){b.addEventListener('click',function(){S.hero={id:b.dataset.id};save();showTopics();});});
+  app.querySelectorAll('[data-em]').forEach(function(b){b.addEventListener('click',function(){
+    own.emoji=b.dataset.em;app.querySelectorAll('[data-em]').forEach(function(x){x.setAttribute('aria-pressed',x===b);});});});
+  go.addEventListener('click',function(){if(!own.name)return;S.hero={id:'own',name:own.name,emoji:own.emoji};save();showTopics();});
+}
+function showTopics(){
+  halt();
+  var hr=hero();
+  var h='<div class="sky"><div class="play" id="fly" aria-hidden="true"></div><div class="skyin"><div class="row sp"><h2>'+hr.emoji+' '+esc(hr.name)+'</h2><button class="btn plain" id="chg">Кейіпкерді ауыстыру</button></div>'+
+        '<p class="demo">Демо нұсқа</p><p>Тақырыпты таңда. Демо нұсқада алғашқы '+DEMO_T+' тақырып ашық, әрқайсысында бейнесабақ және '+PER_T+' есеп бар.</p><p class="sect">1-сынып</p><ol class="topics">';
+  TOPICS.forEach(function(t,ti){
+    var lk=ti>=DEMO_T;
+    h+='<li><button class="btn topic'+(lk?' locked':'')+'" data-t="'+t.id+'"'+(lk?' data-lock="1"':'')+'><span>'+(lk?'🔒 ':'')+t.title+'<small>'+(lk?'Толық нұсқада':t.sub)+'</small></span><span>'+(lk?'':cnt(t.id)+' / '+PER_T)+'</span></button></li>';
+  });
+  app.innerHTML=h+'</ol><button class="btn main wide" id="club" style="margin-bottom:1rem">🎩 Қызықты математика әуесқойларының клубы<br><small>Тапқырлық, логика, ребустар мен анаграммалар</small></button><button class="btn wide locked" id="book">🔒 Есептер жинағы: '+BOOK_N+' есеп<br><small>Толық нұсқада</small></button>';
+  document.getElementById('book').addEventListener('click',showLocked);
+  flyPlay(document.getElementById('fly'));
+  document.getElementById('club').addEventListener('click',showClub);
+  document.getElementById('chg').addEventListener('click',showHeroes);
+  app.querySelectorAll('[data-t]').forEach(function(b){b.addEventListener('click',function(){
+    if(b.dataset.lock){showLocked();return;}
+    showTopic(TOPICS.filter(function(x){return x.id===b.dataset.t;})[0]);});});
+  window.scrollTo(0,0);
+}
+function showLesson(t,i,auto){
+  halt();var my=TOKEN;
+  var hr=hero(),slides=LESSONS[t.id](hr),sl=slides[i],last=i===slides.length-1,steps='';
+  for(var k=0;k<slides.length;k++)steps+='<span class="'+(k<i?'done':k===i?'now':'')+'"></span>';
+  var h='<div class="row sp"><button class="btn plain" id="back">Тақырыпқа</button>'+
+        '<div class="steps" aria-label="Сабақ, '+(i+1)+'-бөлім, барлығы '+slides.length+'">'+steps+'</div></div>'+
+        '<h2 style="margin-top:1rem">Сабақ. '+t.title+'</h2>'+
+        '<div class="say"><span class="em" aria-hidden="true">'+hr.emoji+'</span><div class="bubble">'+esc(sl.text)+'</div></div>'+
+        '<div class="vis'+(auto?' seq':'')+'" id="vis">'+sl.vis+'</div><div class="row">';
+  if(auto)h+='<button class="btn main" id="pp">⏸ Кідірту</button>';
+  else{
+    h+='<button class="btn main" id="pp">▶ Бейне ретінде көру</button>';
+    if(i>0)h+='<button class="btn" id="prev">Артқа</button>';
+    if(!last)h+='<button class="btn" id="next">Әрі қарай</button>';
+    if(kkVoice())h+='<button class="btn plain" id="listen">🔊 Тыңдау</button>';
+  }
+  h+='<button class="btn'+(last&&!auto?' main':' plain')+'" id="skip">Есептерге</button></div>';
+  app.innerHTML=h;
+  document.getElementById('back').addEventListener('click',function(){halt();showTopic(t);});
+  document.getElementById('skip').addEventListener('click',function(){halt();startLesson(t);});
+  document.getElementById('pp').addEventListener('click',function(){showLesson(t,i,!auto);});
+  var b=document.getElementById('prev');if(b)b.addEventListener('click',function(){showLesson(t,i-1,false);});
+  b=document.getElementById('next');if(b)b.addEventListener('click',function(){showLesson(t,i+1,false);});
+  b=document.getElementById('listen');if(b)b.addEventListener('click',function(){speak(sl.text);});
+  window.scrollTo(0,0);
+  if(!auto)return;
+  var kids=Array.prototype.slice.call(document.getElementById('vis').children),fin=0,spoken=false;
+  function part(){fin++;if(fin===2)setTimeout(function(){if(my!==TOKEN)return;if(last)showLesson(t,i,false);else showLesson(t,i+1,true);},1500);}
+  function sp(){if(!spoken){spoken=true;part();}}
+  kids.forEach(function(el,n){setTimeout(function(){if(my===TOKEN)el.classList.add('on');},500+n*1300);});
+  setTimeout(part,500+kids.length*1300);
+  var talking=speak(sl.text,sp);
+  setTimeout(sp,talking?4000+sl.text.length*110:2500+sl.text.length*70);
+}
+var TCACHE={};
+function tasksFor(t){
+  var hr=hero(),key=t.id+'|'+hr.name;if(TCACHE[key])return TCACHE[key];
+  var idx=TOPICS.indexOf(t),list=[],seen={},n,k,task,id;
+  for(n=0;n<PER_T;n++){
+    for(k=0;k<25;k++){RNG=seeded((idx+1)*100003+n*131+k*7919);task=t.gen(hr);id=task.text+'|'+task.big;if(!seen[id])break;}
+    seen[id]=1;list.push(task);
+  }
+  RNG=RAND;return TCACHE[key]=list;
+}
+function firstOpen(t){var d=S.done[t.id]||{};for(var n=0;n<PER_T;n++)if(!d[n])return n;return -1;}
+function startLesson(t){var n=firstOpen(t);if(n<0)showTopic(t);else play(t,n);}
+function showTopic(t){
+  halt();
+  var d=S.done[t.id]||{},n,open=firstOpen(t);
+  var h='<div class="row sp"><button class="btn plain" id="back">Тақырыптарға</button><span>Шығарылғаны: '+cnt(t.id)+' / '+PER_T+'</span></div>'+
+        '<h2 style="margin:1rem 0 .2rem">'+t.title+'</h2><p>'+t.sub+'</p>'+
+        '<div class="row"><button class="btn main" id="video">▶ Сабақты көру</button>'+
+        (open>=0?'<button class="btn" id="go">'+(cnt(t.id)?'Жалғастыру':'Есептерді бастау')+'</button>':'')+'</div>'+
+        '<p class="sect" style="margin-top:1.4rem">Есептер</p><div class="nums">';
+  for(n=0;n<PER_T;n++)h+='<button class="btn'+(d[n]?' solved':'')+'" data-n="'+n+'" aria-label="'+(n+1)+'-есеп'+(d[n]?', шығарылған':'')+'">'+(n+1)+'</button>';
+  app.innerHTML=h+'</div>';
+  document.getElementById('back').addEventListener('click',showTopics);
+  document.getElementById('video').addEventListener('click',function(){showLesson(t,0,true);});
+  var g=document.getElementById('go');if(g)g.addEventListener('click',function(){play(t,open);});
+  app.querySelectorAll('[data-n]').forEach(function(b){b.addEventListener('click',function(){play(t,+b.dataset.n);});});
+  window.scrollTo(0,0);
+}
+/* бір есептің экраны: тақырыптағы есептерге де, жинаққа да ортақ */
+function taskScreen(k,em,label,backText,onBack,onRight){
+  var locked=false;
+  var h='<div class="row sp"><button class="btn plain" id="back">'+backText+'</button><span>'+label+'</span></div>'+
+        '<div class="say"><span class="em" aria-hidden="true">'+em+'</span><div class="bubble">'+esc(k.text)+'</div></div>'+
+        '<div class="big'+(k.pics?' pics':'')+'">'+k.big+'</div>'+
+        '<div class="opts'+(k.three?' three':'')+(k.words?' words':'')+'">';
+  k.opts.forEach(function(o,i){h+='<button class="btn" data-i="'+i+'">'+o.label+'</button>';});
+  h+='</div><div class="note" id="note" aria-live="polite"></div>';
+  if(kkVoice())h+='<button class="btn plain" id="listen">🔊 Тапсырманы тыңдау</button>';
+  app.innerHTML=h;var sc=SCORE.start(k.lv||2);
+  var note=document.getElementById('note');
+  document.getElementById('back').addEventListener('click',function(){halt();onBack();});
+  var ls=document.getElementById('listen');if(ls)ls.addEventListener('click',function(){speak(k.text);});
+  app.querySelectorAll('.opts .btn').forEach(function(b){b.addEventListener('click',function(){
+    if(locked)return;
+    if(k.opts[+b.dataset.i].v===k.ans){
+      locked=true;b.classList.add('ok');var pt=SCORE.finish(sc);
+      var q=app.querySelector('.q');if(q){q.textContent=k.ans;q.classList.add('got');}
+      note.innerHTML='<div class="good">'+PRAISE[Math.floor(Math.random()*PRAISE.length)]+' '+SCORE.badge(pt)+'</div>';
+      setTimeout(function(){onRight(pt);},1300);
+    }else{
+      sc.miss++;b.classList.add('no');b.disabled=true;
+      note.innerHTML='<div class="hint"><strong>Көмек.</strong> '+k.hint+'</div>';
+    }
+  });});
+  window.scrollTo(0,0);
+}
+function play(t,n){
+  var kt=tasksFor(t)[n];kt.lv=LV[t.id]||2;
+  taskScreen(kt,hero().emoji,(n+1)+'-есеп / '+PER_T,'Тақырыпқа',function(){showTopic(t);},function(pt){
+    if(!S.done[t.id])S.done[t.id]={};S.done[t.id][n]=Math.max(S.done[t.id][n]||0,pt);save();
+    if((n+1)%10===0)showBreak(t,n);else play(t,n+1);
+  });
+}
+function showBreak(t,n){
+  var hr=hero(),c=cnt(t.id),all=c>=PER_T,more=n+1<PER_T;
+  app.innerHTML='<div class="final"><div class="em">'+hr.emoji+'</div><h1>'+(all?'Тақырып аяқталды':'Жарайсың')+'</h1>'+
+    '<p>'+esc(t.title)+'. Шығарылғаны: '+c+' / '+PER_T+'.</p><p>'+(all?'Тақырыптың барлық есебі шығарылды!':'Демалуға немесе жалғастыруға болады.')+'</p>'+
+    '<div class="row">'+(more?'<button class="btn main" id="more">Жалғастыру</button>':'')+'<button class="btn" id="home">Тақырыпқа</button></div></div>';
+  var m=document.getElementById('more');if(m)m.addEventListener('click',function(){play(t,n+1);});
+  document.getElementById('home').addEventListener('click',function(){showTopic(t);});
+  window.scrollTo(0,0);
+}
+
+/* ---------- қызықты математика әуесқойларының клубы ---------- */
+var TRI='<svg viewBox="0 0 120 90" width="190" height="142" aria-hidden="true"><path d="M60 8 L10 82 H110Z M60 8 V82" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg>';
+var SQR='<svg viewBox="0 0 100 100" width="150" height="150" aria-hidden="true"><path d="M8 8 H92 V92 H8Z M50 8 V92 M8 50 H92" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg>';
+function cq(q,ans,why,opts,big){return {q:q,ans:ans,why:why,opts:opts,big:big};}
+var SEQ='Сұрақ белгісінің орнында қандай сан тұруы керек?';
+var REB='Ребусты шеш. Мұнда қандай сөз жасырылған?';
+function rebN(big,ans,num,word,sum,opts){return cq(REB,ans,num+' санын «'+word+'» деп оқимыз: '+sum+' = '+ans+'.',opts,big);}
+function rebP(big,ans,pic,sum,opts){return cq(REB,ans,'Суретте '+pic+' тұр: '+sum+' = '+ans+'.',opts,big);}
+function ana(word,clue,ans,opts){return cq(word+' сөзіндегі әріптердің орнын ауыстырып, жаңа сөз құра: '+clue+'.',ans,word+' және '+ans.toUpperCase()+' сөздерінде әріптер бірдей, тек орындары басқа.',opts,word);}
+function mix(letters,ans,opts){return cq('Әріптер шатасып кетті. Олардан сөз құра.',ans,'Бұл әріптерден '+ans.toUpperCase()+' сөзі шығады.',opts,letters);}
+var CLUB=[
+ {id:'smart',title:'Тапқырлық есептері',sub:'Әзіл есептер мен қулығы бар есептер',
+  intro:'Мұндай есептерді ескі оқулықтарда беттің соңына жұлдызшамен басатын. Оларда санау аз, бірақ мұқият оқу керек.',
+  hint:'Есепті тағы бір рет асықпай оқы. Онда қулық жасырылған.',tasks:[
+  cq('Таяқтың екі ұшы бар. Бір ұшын кесіп тастады. Таяқта неше ұш қалды?',2,'Таяқ қысқарды, бірақ оның бәрібір екі ұшы бар.'),
+  cq('Үстелде 4 алма жатты. Біреуін қақ ортасынан бөлді. Үстелде неше алма бар?',4,'Алманы бөлді, бірақ алып кеткен жоқ. Алма бұрынғыдай 4.'),
+  cq('Үш ат жегілген арба 5 шақырым жүрді. Әр ат неше шақырым жүрді?',5,'Аттар бірге жүрді, сондықтан әрқайсысы 5 шақырым жүрді.'),
+  cq('Үстелдің 4 бұрышы бар. Бір бұрышын кесіп тастады. Үстелде неше бұрыш болды?',5,'Бір бұрыштың орнына екі жаңа бұрыш пайда болды: 4 − 1 + 2 = 5.'),
+  cq('Әтеш бір аяғымен тұрғанда 3 кг тартады. Екі аяғымен тұрғанда неше килограмм тартады?',3,'Әтештің салмағы неше аяқпен тұрғанына байланысты емес.'),
+  cq('Жеті ағайынды жігіттің бір қарындасы бар — бәріне ортақ. Отбасында барлығы неше бала бар?',8,'7 ұл және 1 қыз: 7 + 1 = 8.'),
+  cq('{N} өзенге бара жатыр. Қарсы алдынан 3 балықшы келе жатыр, әрқайсысында 2 шелек бар. Өзенге неше адам бара жатыр?',1,'Өзенге тек {N} бара жатыр. Балықшылар қарсы, яғни өзеннен келе жатыр.'),
+  cq('Қорапта 3 жұп қолғап жатыр. Қорапта барлығы неше қолғап бар?',6,'Бір жұпта 2 қолғап бар: 2 + 2 + 2 = 6.'),
+  cq('Аспанда қарға, алабұға, 2 торғай, 3 қарлығаш және 4 сазан ұшып бара жатты. Неше құс ұшып бара жатты?',6,'Алабұға мен сазан — балықтар, олар ұшпайды. Құстар: 1 + 2 + 3 = 6.'),
+  cq('Бөренені аралап, 3 бөлікке бөлді. Неше рет аралады?',2,'Бірінші рет аралағанда 2 бөлік, екінші рет аралағанда 3 бөлік шығады.'),
+  cq('Жол бойында 5 бұта өсіп тұр. Көрші бұталардың арасы 1 метр. Бірінші бұтадан соңғы бұтаға дейін неше метр?',4,'Бес бұтаның арасында 1 метрден 4 аралық бар.'),
+  cq('Отбасында 2 қыз бар. Әр қыздың бір ағасы бар. Отбасында ең кемі неше бала бар?',3,'Аға екеуіне ортақ болуы мүмкін: 2 қыз және 1 ұл.'),
+  cq('Сатыда 9 баспалдақ бар. Дәл ортасында тұру үшін нешінші баспалдаққа шығу керек?',5,'Бесінші баспалдақтың астында 4 баспалдақ, үстінде де 4 баспалдақ бар.'),
+  cq('Бірінші қабаттан екінші қабатқа көтерілу үшін 10 баспалдақ басу керек. Бірінші қабаттан үшінші қабатқа дейін неше баспалдақ басу керек?',20,'Біріншіден үшіншіге дейін екі аралық бар: 10 + 10 = 20.'),
+  cq('Қайсысы ауыр: бір килограмм мақта ма, әлде бір килограмм темір ме?','бірдей','Екеуі де тура бір килограмм.',['мақта','темір','бірдей']),
+  cq('Екі әке мен екі бала таңғы асқа 3 алма жеді, әрқайсысына бір-бір бүтін алмадан тиді. Таңғы асты неше адам ішті?',3,'Бұл — ата, әке және бала. Әке әрі әке, әрі бала болып саналады.'),
+  cq('Үш тышқанның неше құлағы бар?',6,'Әр тышқанның 2 құлағы бар: 2 + 2 + 2 = 6.'),
+  cq('Жүйекте 6 торғай отырды. Оларға тағы 2 торғай келіп қосылды, содан кейін мысық бәрін үркітіп жіберді. Жүйекте неше торғай қалды?',0,'Мысық бәрін үркітіп жіберді, жүйекте ешкім қалмады.')]},
+ {id:'logic',title:'Логика және заңдылықтар',sub:'Ережені тап, қадамдап ойлан',
+  intro:'Мұнда сандар қатарының ережесін байқау немесе жауапқа қадам-қадаммен жету керек.',
+  hint:'Асықпа. Әр қадамда не өзгеретінін байқап, ретімен ойлан.',tasks:[
+  cq(SEQ,10,'Әр сан алдыңғысынан 2-ге артық.',null,'2, 4, 6, 8, ?'),
+  cq(SEQ,9,'Әр сан алдыңғысынан 2-ге артық.',null,'1, 3, 5, 7, ?'),
+  cq(SEQ,4,'Әр сан алдыңғысынан 2-ге кем.',null,'10, 8, 6, ?'),
+  cq(SEQ,11,'Алдымен 1-ді, сосын 2-ні, сосын 3-ті, сосын 4-ті қосамыз.',null,'1, 2, 4, 7, ?'),
+  cq(SEQ,20,'Әр сан алдыңғысынан 5-ке артық.',null,'5, 10, 15, ?'),
+  cq(SEQ,11,'Әр сан алдыңғысынан 3-ке кем.',null,'20, 17, 14, ?'),
+  cq(SEQ,3,'Әр сан екі реттен қайталанады.',null,'1, 1, 2, 2, 3, ?'),
+  cq('Қандай сан жасырынған?',4,'4 + 1 = 5, ал 9-ға дейін тағы 4 жетпейді.',null,'4 + ? + 1 = 9'),
+  cq('Анар 7 жаста, ал оның ағасы одан 2 жас үлкен. Бір жылдан кейін ағасы неше жаста болады?',10,'Қазір ағасы 7 + 2 = 9 жаста, бір жылдан кейін 10 жаста болады.'),
+  cq('Мұрат Қайраттан биік, ал Қайрат Саматтан биік. Ең аласасы кім?','Самат','Қайрат Мұраттан аласа, ал Самат Қайраттан да аласа.',['Мұрат','Қайрат','Самат']),
+  cq('{N} бір сан ойлады. Оған 3-ті қосса, 8 шығады. Бұл қандай сан?',5,'8-ден 3-ті азайтамыз: 5 шығады.'),
+  cq('Екі бірдей санды қосқанда 8 шықты. Қандай санды қосты?',4,'4 + 4 = 8.'),
+  cq('Вазада кәмпиттер жатыр. 2 кәмпитті жесе, 5 кәмпит қалады. Вазада неше кәмпит бар?',7,'5 + 2 = 7.'),
+  cq('Айгүл мен Даниярдың қарындаштарының саны бірдей. Екеуінде барлығы 10 қарындаш бар. Айгүлде неше қарындаш бар?',5,'10 — бұл 5 және 5.'),
+  cq('Қоян кірпіден жылдам жүгіреді, ал кірпі тасбақадан жылдам. Ең соңынан кім келеді?','тасбақа','Тасбақа кірпіден баяу, ал кірпі қояннан баяу.',['қоян','кірпі','тасбақа'])]},
+ {id:'kvant',title:'«Квант» журналының ізімен',sub:'Қиынырақ есептер, ең табандылар үшін',
+  intro:'«Квант» журналы 1970 жылдан бері шығады, онда кіші оқушыларға арналған бет те болған. Мұнда сол үлгідегі есептер жиналған: сандық ребустар, таразы және өткел есептері. Олар қиын, сондықтан ересектермен бірге шығаруға болады.',
+  hint:'Бұл қиын есеп. Оның суретін салып немесе заттармен ойнап көр.',tasks:[
+  cq('А әрпімен цифр жасырылған. Ол қандай цифр?',4,'4 + 4 = 8.',null,'А + А = 8'),
+  cq('Б әрпімен цифр жасырылған. Ол қандай цифр?',3,'3 + 3 + 3 = 9.',null,'Б + Б + Б = 9'),
+  cq('Бірдей әріптер — бірдей цифрлар. А әрпінің артында қандай цифр жасырынған?',1,'11 + 1 = 12, демек, А — бұл 1.',null,'АА + А = 12'),
+  cq('А санын тап.',3,'3 және 2 сандары сәйкес келеді: 3 + 2 = 5 және 3 − 2 = 1.',null,'А + Б = 5<br>А − Б = 1'),
+  cq('Таразының бір басында қарбыз, екінші басында 2 бірдей қауын жатыр. Таразы тепе-теңдікте тұр. Бір қауын 3 кг тартады. Қарбыз неше килограмм тартады?',6,'Қарбыз екі қауынмен бірдей тартады: 3 + 3 = 6.'),
+  cq('Кірпіш 1 кг және тағы жарты кірпіштей тартады. Кірпіш неше килограмм тартады?',2,'Кірпіш — бұл 1 кг және жарты кірпіш. Демек, екінші жартысы 1 кг тартады, ал бүтін кірпіш — 2 кг.'),
+  cq('Ұлу биіктігі 5 метр бағанмен жоғары өрмелеп келеді. Күндіз ол 3 метрге көтеріледі, ал түнде 2 метрге төмен сырғиды. Ұлу бағанның басына нешінші күні жетеді?',3,'Екінші күннің таңында ол 1 м биіктікте, үшінші күннің таңында 2 м биіктікте болады. Үшінші күні тағы 3 метрге көтеріліп, басына жетеді.'),
+  cq('Суретте неше үшбұрыш бар?',3,'Екі кішкентай және солардан құралған бір үлкен үшбұрыш.',null,TRI),
+  cq('Суретте неше шаршы бар?',5,'Төрт кішкентай және бір үлкен шаршы.',null,SQR),
+  cq('Жәшікте 2 қызыл және 2 көк шұлық жатыр. Түсі бірдей екі шұлық нақты шығуы үшін қарамай тұрып неше шұлық алу керек?',3,'Екі шұлықтың түсі әртүрлі болып шығуы мүмкін. Үшіншісі міндетті түрде солардың біреуімен түстес болады.'),
+  cq('5 тиынды 1 тиындық және 2 тиындық тиындармен неше тәсілмен жинауға болады?',3,'Бес 1 тиындық; бір 2 тиындық және үш 1 тиындық; екі 2 тиындық және бір 1 тиындық.'),
+  cq('Шаруа өзеннен қасқырды, ешкіні және қырыққабатты өткізуі керек. Қайыққа өзі және тағы біреуі ғана сыяды. Қасқыр мен ешкіні, ешкі мен қырыққабатты қараусыз қалдыруға болмайды. Қайық өзенді неше рет кесіп өтеді?',7,'Ешкіні апарады, қайтады, қасқырды апарады, ешкіні кері алып қайтады, қырыққабатты апарады, қайтады және ешкіні апарады. Барлығы 7 рет.')]},
+ {id:'rebus',title:'Ребустар',sub:'Цифрлар, әріптер және суреттер',
+  intro:'Ребустарды балалар журналдары мен жұмбақ кітаптарының соңғы беттеріне басатын. Ребуста цифрды сөзбен оқиды: 5 — «бес», 100 — «жүз». Суретті бір сөзбен атайды.',
+  hint:'Цифрды немесе суретті сөзбен атап, бәрін қосып оқы.',tasks:[
+  rebN('5ІК','бесік','5','бес','бес + ік',['бесік','есік','кесе','белбеу']),
+  rebN('100ІМ','жүзім','100','жүз','жүз + ім',['жүзім','жүзік','жұлдыз','жеміс']),
+  rebP('🌙 + НА','айна','ай','ай + на',['айна','айран','ана','аяқ']),
+  rebN('6Н','алтын','6','алты','алты + н',['алтын','алма','күміс','ақша']),
+  rebP('🏠 + РЕК','үйрек','үй','үй + рек',['үйрек','қаз','күрек','жүрек']),
+  rebN('10ДЫҚ','ондық','10','он','он + дық',['ондық','бірлік','орындық','жүздік']),
+  rebP('❄️ + БЫЗ','қарбыз','қар','қар + быз',['қарбыз','қауын','қарға','асқабақ']),
+  rebN('1ЛІК','бірлік','1','бір','бір + лік',['бірлік','ондық','бірге','тірлік']),
+  rebP('💧 + РЕТ','сурет','су','су + рет',['сурет','сүт','дәптер','суық']),
+  rebN('40АЯҚ','қырықаяқ','40','қырық','қырық + аяқ',['қырықаяқ','сегізаяқ','құмырсқа','өрмекші']),
+  rebP('🍎 + ТЫ','Алматы','алма','алма + ты',['Алматы','Астана','Ақтау','Атырау']),
+  rebN('3БҰРЫШ','үшбұрыш','3','үш','үш + бұрыш',['үшбұрыш','төртбұрыш','шаршы','дөңгелек']),
+  rebP('🐟 + ШЫ','балықшы','балық','балық + шы',['балықшы','аңшы','бақташы','балшық']),
+  rebN('8АЯҚ','сегізаяқ','8','сегіз','сегіз + аяқ',['сегізаяқ','қырықаяқ','шаян','тасбақа']),
+  rebP('🌹 + ЗАР','гүлзар','гүл','гүл + зар',['гүлзар','базар','бақша','гүлдесте']),
+  rebN('40ҚАБАТ','қырыққабат','40','қырық','қырық + қабат',['қырыққабат','сәбіз','қияр','қызылша']),
+  rebP('🔥 + АН','Отан','от','от + ан',['Отан','отын','отбасы','орман']),
+  rebN('5БАРМАҚ','бесбармақ','5','бес','бес + бармақ',['бесбармақ','бауырсақ','палау','қуырдақ'])]},
+ {id:'anagram',title:'Анаграммалар',sub:'Әріптердің орнын ауыстыр — жаңа сөз шығады',
+  intro:'Анаграмма — әріптерінен басқа сөз құрауға болатын сөз. Бірде-бір әріпті жоғалтуға да, қосуға да болмайды.',
+  hint:'Әріптерін тексер: жауапта тапсырмадағы барлық әріп болуы керек, артық әріп болмауы керек.',tasks:[
+  ana('ҚАС','«абай» деген сөздің мағынасы','сақ',['сақ','батыл','күшті','жылдам']),
+  ana('КЕСЕ','құлағы ұзын жануар','есек',['есек','қоян','түйе','ешкі']),
+  ana('АЛМА','қосу мен азайту — математикалық …','амал',['амал','есеп','сан','таңба']),
+  ana('НОТА','туған ел','Отан',['Отан','ауыл','қала','дала']),
+  ana('АРНА','қызыл дәнді жеміс','анар',['анар','өрік','шие','алмұрт']),
+  ana('АСЫЛ','«жақын» сөзіне қарама-қарсы сөз','алыс',['алыс','биік','ұзын','кең']),
+  ana('АМАН','«менің шешем» деген сөз','анам',['анам','әкем','апам','атам']),
+  ana('ҚАЛАМ','биік қабырғалы бекініс','қамал',['қамал','сарай','қала','үй']),
+  ana('ҚАЛАМ','халықтың нақыл сөзі','мақал',['мақал','жұмбақ','ертегі','өлең']),
+  ana('ТАМАҚ','одан мата тоқитын ақ өсімдік','мақта',['мақта','жүн','жібек','бидай']),
+  ana('САБАҚ','«өзге» деген сөздің мағынасы','басқа',['басқа','басты','бірге','бәрі']),
+  ana('ТАРАҚ','бір сызықтың бойына тізілу','қатар',['қатар','топ','шеңбер','үйме']),
+  ana('ҚЫРАН','адамның іші','қарын',['қарын','арқа','иық','тізе']),
+  mix('С У О Қ','қосу',['қосу','қасық','қоян','сурет']),
+  mix('П Е С Е','есеп',['есеп','есік','есек','себет']),
+  mix('З І Г Е С','сегіз',['сегіз','семіз','егіз','теңіз']),
+  mix('З Ы Ғ О Т','тоғыз',['тоғыз','отыз','тоқсан','қағаз']),
+  mix('Қ Ы Д Н О','ондық',['ондық','бірлік','орындық','жүздік']),
+  mix('Ы Ш А Р Ш','шаршы',['шаршы','шатыр','шашу','шыны']),
+  mix('К І Р Л І Б','бірлік',['бірлік','тірлік','бірге','білім']),
+  mix('П А У А Ж','жауап',['жауап','сұрақ','жаңбыр','жапырақ']),
+  mix('Й А Т У З А','азайту',['азайту','қосу','көбейту','бөлу'])]}
+];
+CLUB.forEach(function(c){c.tasks=c.tasks.slice(0,DEMO_C);});
+function showLocked(){
+  halt();
+  app.innerHTML='<div class="final"><div class="em">🔒</div><h1>Толық нұсқада</h1>'+
+    '<p>Бұл бөлім AZIMA бағдарламасының толық нұсқасында ашылады.</p>'+
+    '<p>Толық нұсқада: 20 тақырып, әрқайсысында 50 есеп, 2000 есептен тұратын жинақ және клубтың 85 есебі.</p>'+
+    '<div class="row"><button class="btn main" id="home">Тақырыптарға</button></div></div>';
+  document.getElementById('home').addEventListener('click',showTopics);
+  window.scrollTo(0,0);
+}
+function clubCnt(id){return Object.keys(S.club[id]||{}).length;}
+function showClub(){
+  halt();
+  var all=0,done=0;CLUB.forEach(function(c){all+=c.tasks.length;done+=clubCnt(c.id);});
+  var h='<div class="row sp"><button class="btn plain" id="back">Тақырыптарға</button><span>Шығарылғаны: '+done+' / '+all+'</span></div>'+
+    '<h2 style="margin:1rem 0 .3rem">Қызықты математика әуесқойларының клубы</h2>'+
+    '<p>Клуб есептері ескі мектеп оқулықтарының, балаларға арналған жұмбақ кітаптарының және «Квант» журналының кіші оқушыларға арналған бетінің үлгісімен жазылған.</p><ol class="topics">';
+  CLUB.forEach(function(c,i){
+    h+='<li><button class="btn topic" data-c="'+i+'"><span>'+c.title+'<small>'+c.sub+'</small></span><span>'+clubCnt(c.id)+' / '+c.tasks.length+'</span></button></li>';
+  });
+  app.innerHTML=h+'</ol>';
+  document.getElementById('back').addEventListener('click',showTopics);
+  app.querySelectorAll('[data-c]').forEach(function(b){b.addEventListener('click',function(){showClubSec(CLUB[+b.dataset.c]);});});
+  window.scrollTo(0,0);
+}
+function showClubSec(c){
+  halt();
+  var d=S.club[c.id]||{},n;
+  var h='<div class="row sp"><button class="btn plain" id="back">Клубқа</button><span>Шығарылғаны: '+clubCnt(c.id)+' / '+c.tasks.length+'</span></div>'+
+    '<h2 style="margin:1rem 0 .3rem">'+c.title+'</h2><p>'+c.intro+'</p><div class="nums">';
+  for(n=0;n<c.tasks.length;n++)h+='<button class="btn'+(d[n]?' solved':'')+'" data-n="'+n+'" aria-label="'+(n+1)+'-есеп'+(d[n]?', шығарылған':'')+'">'+(n+1)+'</button>';
+  app.innerHTML=h+'</div>';
+  document.getElementById('back').addEventListener('click',showClub);
+  app.querySelectorAll('[data-n]').forEach(function(b){b.addEventListener('click',function(){clubPlay(c,+b.dataset.n);});});
+  window.scrollTo(0,0);
+}
+function clubPlay(c,n){
+  var hr=hero(),k=c.tasks[n],N=esc(hr.name),locked=false,opts,words=!!k.opts;
+  var q=esc(k.q).replace(/\{N\}/g,N),why=k.why.replace(/\{N\}/g,N);
+  if(words)opts=k.opts.map(function(x){return [Math.random(),x];}).sort(function(a,b){return a[0]-b[0];}).map(function(x){return {v:x[1],label:x[1]};});
+  else opts=numOpts(k.ans,0,Math.max(10,k.ans+3));
+  var h='<div class="row sp"><button class="btn plain" id="back">Бөлімге</button><span>'+(n+1)+'-есеп / '+c.tasks.length+'</span></div>'+
+        '<div class="say"><span class="em" aria-hidden="true">'+hr.emoji+'</span><div class="bubble">'+q+'</div></div>';
+  if(k.big)h+='<div class="big club">'+k.big.replace('?',Q)+'</div>';
+  h+='<div class="opts'+(words?' words':'')+'">';
+  opts.forEach(function(o,i){h+='<button class="btn" data-i="'+i+'">'+o.label+'</button>';});
+  h+='</div><div class="note" id="note" aria-live="polite"></div>';
+  if(kkVoice())h+='<button class="btn plain" id="listen">🔊 Есепті тыңдау</button>';
+  app.innerHTML=h;var sc=SCORE.start(c.id==='logic'?2:3);
+  var note=document.getElementById('note');
+  document.getElementById('back').addEventListener('click',function(){halt();showClubSec(c);});
+  var ls=document.getElementById('listen');if(ls)ls.addEventListener('click',function(){speak(k.q.replace(/\{N\}/g,hr.name));});
+  app.querySelectorAll('.opts .btn').forEach(function(b){b.addEventListener('click',function(){
+    if(locked)return;
+    if(opts[+b.dataset.i].v===k.ans){
+      locked=true;b.classList.add('ok');var pt=SCORE.finish(sc);
+      var qq=app.querySelector('.q');if(qq){qq.textContent=k.ans;qq.classList.add('got');}
+      if(!S.club[c.id])S.club[c.id]={};S.club[c.id][n]=Math.max(S.club[c.id][n]||0,pt);save();
+      var last=n+1>=c.tasks.length;
+      note.innerHTML='<div class="good">'+PRAISE[Math.floor(Math.random()*PRAISE.length)]+' '+SCORE.badge(pt)+'</div><div class="hint"><strong>Неге олай.</strong> '+why+'</div>'+
+        '<p><button class="btn main" id="nx">'+(last?'Бөлімге':'Келесі есеп')+'</button></p>';
+      document.getElementById('nx').addEventListener('click',function(){if(last)showClubSec(c);else clubPlay(c,n+1);});
+    }else{
+      sc.miss++;b.classList.add('no');b.disabled=true;
+      note.innerHTML='<div class="hint"><strong>Көмек.</strong> '+c.hint+'</div>';
+    }
+  });});
+  window.scrollTo(0,0);
+}
+
+/* ---------- есептер жинағы: 2000 есеп ---------- */
+var BOOK_N=2000,SEC_N=200;
+/* Жинақтағы кейіпкерлер тізімі: құрамын өзгерту үшін тек осы тізімді түзетіңіз. */
+var CAST=[
+ ['Маша','👧'],['Крош','🐰'],['Нюша','🐷'],['Нолик','🔧'],['Симка','🔩'],
+ ['Коржик','🐱'],['Карамелька','🎀'],['Компот','🍎'],['Лунтик','🌙'],['Чебурашка','🍊'],
+ ['Кеша','🐻'],['Буба','🐭'],['Блуи','🐶'],['Пеппа','🐽'],['Скай','🚁'],
+ ['Маршал','🚒'],['Соник','🦔'],['Марио','🍄'],['Пикачу','⚡'],['Стич','👽']
+].map(function(x){return {name:x[0],emoji:x[1]};});
+/* зат, қайда/қашан, не істеді, азайту әрекеті */
+var CTX=[
+ ['саңырауқұлақ','орманнан','жинады','тиінге берді'],
+ ['бүр','шыршаның түбінен','тапты','кірпіге берді'],
+ ['бақалшақ','жағадан','тапты','досына сыйлады'],
+ ['тиын','сандықтан','тапты','билетке жұмсады'],
+ ['кітап','кітапханадан','алды','қайтарып берді'],
+ ['шар','мерекеге','үрледі','балаларға сыйлады'],
+ ['кәмпит','қапшыққа','салды','қонақтарға таратты'],
+ ['жалауша','жіпке','ілді','шешіп алды'],
+ ['текше','мұнараға','қойды','қорапқа жинады'],
+ ['қарындаш','қаламсауытқа','салды','көршісіне берді'],
+ ['алма','бақтан','үзді','бәлішке салды'],
+ ['жаңғақ','шөптің арасынан','тапты','тиінге берді'],
+ ['тас','өзен жағасынан','жинады','суға лақтырды'],
+ ['хат','достарына','жазды','поштаға апарды'],
+ ['қар кесегі','аулада','жасады','нысанаға лақтырды'],
+ ['бәліш','таңертең','пісірді','көршілерге таратты'],
+ ['төсбелгі','жарыста','алды','командасына сыйлады'],
+ ['гүл','гүлзарға','отырғызды','гүл шоғына кесіп алды'],
+ ['шам','кешке','жақты','сөндірді'],
+ ['кілт','жолдан','тапты','жоғалтып алды']
+];
+var SECT=['Қосындыны табамыз','Екеуінде барлығы нешеу','Қалғанын табамыз','Бірнешеге артық','Бірнешеге кем',
+          'Нешеге артық','Нешеге кем','Нешеуі қосылды','Нешеуі алынды','20-ға дейінгі есептер'];
+function bookTask(i){
+  var j=i%SEC_N,k=Math.floor(i/SEC_N),c=CTX[j%20],h=CAST[(j%20+Math.floor(j/20))%20],f=c[0],pre=c[1],get=c[2],lose=c[3],N=h.name;
+  var r=seeded(i*7919+13),ri=function(a,b){return a+Math.floor(r()*(b-a+1));};
+  var a,b,ans,text,hint,max=10,start=N+' '+pre+' ';
+  if(k===0){a=ri(2,7);b=ri(1,10-a);ans=a+b;
+    text=start+a+' '+f+' '+get+', содан кейін тағы '+b+' '+f+' '+get+'. Барлығы неше '+f+' болды?';
+    hint='Көбейді, сондықтан қосамыз: '+a+' + '+b+'.';}
+  else if(k===1){a=ri(2,7);b=ri(1,10-a);ans=a+b;
+    text=start+a+' '+f+' '+get+', ал досы '+b+' '+f+' '+get+'. Екеуінде барлығы неше '+f+' бар?';
+    hint='«Барлығы» дегенде қосамыз: '+a+' + '+b+'.';}
+  else if(k===2){a=ri(3,10);b=ri(1,a-1);ans=a-b;
+    text=a+' '+f+' бар еді. '+N+' оның '+b+' данасын '+lose+'. Неше '+f+' қалды?';
+    hint='Азайды, сондықтан азайтамыз: '+a+' − '+b+'.';}
+  else if(k===3){a=ri(2,7);b=ri(1,10-a);ans=a+b;
+    text=start+a+' '+f+' '+get+', ал досы одан '+b+' '+f+' артық '+get+'. Досы неше '+f+' '+get+'?';
+    hint='«Артық» дегенде қосамыз: '+a+' + '+b+'.';}
+  else if(k===4){a=ri(3,10);b=ri(1,a-1);ans=a-b;
+    text=start+a+' '+f+' '+get+', ал досы одан '+b+' '+f+' кем '+get+'. Досы неше '+f+' '+get+'?';
+    hint='«Кем» дегенде азайтамыз: '+a+' − '+b+'.';}
+  else if(k===5){a=ri(3,10);b=ri(1,a-1);ans=a-b;
+    text=start+a+' '+f+' '+get+', ал досы '+b+' '+f+' '+get+'. '+N+' досынан неше '+f+' артық '+get+'?';
+    hint='Үлкен саннан кіші санды азайтамыз: '+a+' − '+b+'.';}
+  else if(k===6){b=ri(3,10);a=ri(2,b-1);ans=b-a;
+    text=start+a+' '+f+' '+get+', ал досы '+b+' '+f+' '+get+'. '+N+' досынан неше '+f+' кем '+get+'?';
+    hint='Үлкен саннан кіші санды азайтамыз: '+b+' − '+a+'.';}
+  else if(k===7){a=ri(2,8);b=ri(a+1,10);ans=b-a;
+    text=a+' '+f+' бар еді. '+N+' '+pre+' тағы бірнеше '+f+' '+get+', сонда '+b+' '+f+' болды. Неше '+f+' қосылды?';
+    hint='Соңында болған саннан бастапқы санды азайтамыз: '+b+' − '+a+'.';}
+  else if(k===8){a=ri(3,10);b=ri(1,a-1);ans=a-b;
+    text=a+' '+f+' бар еді. '+N+' бірнешеуін '+lose+', сонда '+b+' '+f+' қалды. '+N+' неше '+f+' '+lose+'?';
+    hint='Бастапқы саннан қалған санды азайтамыз: '+a+' − '+b+'.';}
+  else{max=20;
+    if(i%2===0){a=ri(6,9);b=ri(11-a,9);ans=a+b;
+      text=start+a+' '+f+' '+get+', содан кейін тағы '+b+' '+f+' '+get+'. Барлығы неше '+f+' болды?';
+      hint=a+' + '+b+' мысалын бөліктеп шығар: алдымен '+a+' + '+(10-a)+' = 10, содан кейін 10 + '+(b-10+a)+'.';}
+    else{a=ri(11,18);b=ri(2,9);ans=a-b;
+      text=a+' '+f+' бар еді. '+N+' оның '+b+' данасын '+lose+'. Неше '+f+' қалды?';
+      hint=a+' − '+b+' мысалын шығар. '+a+' санында 1 ондық және '+(a-10)+' бірлік бар. Ондық арқылы бөліктеп сана.';}
+  }
+  return {lv:k<3?2:3,hero:h,text:text,big:E([h.emoji,null]),opts:numOpts(ans,0,max),ans:ans,hint:hint};
+}
+function showBook(sec){
+  halt();
+  var keys=Object.keys(S.book),h,i;
+  if(typeof sec!=='number'){
+    h='<div class="row sp"><button class="btn plain" id="back">Тақырыптарға</button><span>Шығарылғаны: '+keys.length+' / '+BOOK_N+'</span></div>'+
+      '<h2 style="margin:1rem 0 .3rem">Есептер жинағы</h2><p>'+SECT.length+' бөлім, әрқайсысында '+SEC_N+' есеп бар. Бөлімді таңда.</p><ol class="topics">';
+    SECT.forEach(function(name,k){
+      var n=keys.filter(function(x){return Math.floor(x/SEC_N)===k;}).length;
+      h+='<li><button class="btn topic" data-s="'+k+'"><span>'+name+'<small>'+(k*SEC_N+1)+'–'+(k*SEC_N+SEC_N)+' есептер</small></span><span>'+n+' / '+SEC_N+'</span></button></li>';
+    });
+    app.innerHTML=h+'</ol>';
+    document.getElementById('back').addEventListener('click',showTopics);
+    app.querySelectorAll('[data-s]').forEach(function(b){b.addEventListener('click',function(){showBook(+b.dataset.s);});});
+  }else{
+    h='<div class="row sp"><button class="btn plain" id="back">Бөлімдерге</button></div>'+
+      '<h2 style="margin:1rem 0 .3rem">'+SECT[sec]+'</h2><p>Кез келген есепті таңда. Шығарылғандары боялған.</p><div class="nums">';
+    for(i=sec*SEC_N;i<sec*SEC_N+SEC_N;i++)h+='<button class="btn'+(S.book[i]?' solved':'')+'" data-n="'+i+'" aria-label="'+(i+1)+'-есеп'+(S.book[i]?', шығарылған':'')+'">'+(i+1)+'</button>';
+    app.innerHTML=h+'</div>';
+    document.getElementById('back').addEventListener('click',function(){showBook();});
+    app.querySelectorAll('[data-n]').forEach(function(b){b.addEventListener('click',function(){playBook(+b.dataset.n);});});
+  }
+  window.scrollTo(0,0);
+}
+function playBook(i){
+  var t=bookTask(i);
+  taskScreen(t,t.hero.emoji,(i+1)+'-есеп / '+BOOK_N,'Жинаққа',function(){showBook(Math.floor(i/SEC_N));},function(pt){
+    S.book[i]=Math.max(S.book[i]||0,pt);save();
+    if(i+1<BOOK_N)playBook(i+1);else showBook();
+  });
+}
+
+if(S.hero)showTopics();else showHeroes();
+}
+</script>
+<script>
+(function(){
+"use strict";
+var LK='azima-demo-lang',AUTHOR='Муса Ташмуканов';
+var ART={tim:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-tim" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#FFC24D"/><stop offset="1" stop-color="#FF8A1F"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-tim)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><path d="M20 100 Q50 72 80 100Z" fill="#2F6BFF"/><circle cx="50" cy="47" r="41" fill="#BFE3FF" stroke="#2F6BFF" stroke-width="4"/><circle cx="50" cy="52" r="28" fill="#FFD9B8"/><path d="M23 48 Q28 22 50 23 Q72 22 77 48 Q63 34 50 37 Q37 34 23 48Z" fill="#7A4B2A"/><circle cx="40" cy="53" r="5" fill="#2B2B4A"/><circle cx="41.6" cy="51.2" r="1.7" fill="#fff"/><circle cx="60" cy="53" r="5" fill="#2B2B4A"/><circle cx="61.6" cy="51.2" r="1.7" fill="#fff"/><circle cx="31" cy="63" r="4.5" fill="#FF9FA8" opacity=".65"/><circle cx="69" cy="63" r="4.5" fill="#FF9FA8" opacity=".65"/><path d="M41 65 Q50 74 59 65" fill="none" stroke="#B5523B" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="5" r="4" fill="#FF2E6E"/><path d="M50 93l1.8 3.8 4.2.5-3 2.9.8 4.1-3.8-2-3.8 2 .8-4.1-3-2.9 4.2-.5z" fill="#F5B700"/></svg>',
+pup:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-pup" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#7FD6FF"/><stop offset="1" stop-color="#2F9BF0"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-pup)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><ellipse cx="21" cy="46" rx="12" ry="23" fill="#8A4B22" transform="rotate(-14 21 46)"/><ellipse cx="79" cy="46" rx="12" ry="23" fill="#8A4B22" transform="rotate(14 79 46)"/><circle cx="50" cy="54" r="34" fill="#FFC978"/><ellipse cx="37" cy="48" rx="11" ry="12" fill="#E8893A"/><ellipse cx="50" cy="69" rx="17" ry="13" fill="#FFF4E6"/><path d="M46 76 Q50 88 54 76Z" fill="#F27A9B"/><ellipse cx="50" cy="63" rx="6" ry="4.5" fill="#3A2A2A"/><path d="M50 67 V72 M42 72 Q46 77 50 72 Q54 77 58 72" fill="none" stroke="#3A2A2A" stroke-width="2.5" stroke-linecap="round"/><circle cx="38" cy="48" r="5" fill="#2B2B4A"/><circle cx="39.6" cy="46.2" r="1.7" fill="#fff"/><circle cx="62" cy="48" r="5" fill="#2B2B4A"/><circle cx="63.6" cy="46.2" r="1.7" fill="#fff"/><path d="M22 31 Q50 0 78 31 Q50 21 22 31Z" fill="#FF2E6E"/><circle cx="50" cy="19" r="5.5" fill="#F5B700"/></svg>',
+mira:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-mira" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#7FF0D2"/><stop offset="1" stop-color="#16B892"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-mira)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><path d="M22 42 Q16 82 30 94 L37 62 H63 L70 94 Q84 82 78 42Z" fill="#FF7A1A"/><circle cx="50" cy="58" r="25" fill="#FFD9B8"/><path d="M25 54 Q30 35 50 38 Q70 35 75 54 Q62 43 50 46 Q38 43 25 54Z" fill="#FF7A1A"/><circle cx="41" cy="60" r="4.6" fill="#2B2B4A"/><circle cx="42.6" cy="58.2" r="1.6" fill="#fff"/><circle cx="59" cy="60" r="4.6" fill="#2B2B4A"/><circle cx="60.6" cy="58.2" r="1.6" fill="#fff"/><circle cx="31" cy="69" r="4.5" fill="#FF9FA8" opacity=".65"/><circle cx="69" cy="69" r="4.5" fill="#FF9FA8" opacity=".65"/><path d="M42 71 Q50 79 58 71" fill="none" stroke="#B5523B" stroke-width="3" stroke-linecap="round"/><path d="M50 0 L73 35 H27Z" fill="#7A3DF0"/><ellipse cx="50" cy="35" rx="35" ry="7" fill="#5A22C8"/><path d="M52 14l2 4.4 4.8.5-3.6 3.2 1 4.7-4.2-2.4-4.2 2.4 1-4.7-3.6-3.2 4.8-.5z" fill="#F5B700"/></svg>',
+bot:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-bot" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#FFE873"/><stop offset="1" stop-color="#F5B400"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-bot)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><path d="M50 16 V5" stroke="#1E78C8" stroke-width="3"/><circle cx="50" cy="5" r="4.5" fill="#F5B700"/><rect x="7" y="36" width="12" height="18" rx="4" fill="#1E78C8"/><rect x="81" y="36" width="12" height="18" rx="4" fill="#1E78C8"/><rect x="17" y="16" width="66" height="58" rx="16" fill="#7FDCFF" stroke="#1E78C8" stroke-width="3"/><rect x="26" y="28" width="48" height="23" rx="11.5" fill="#1F2A44"/><circle cx="40" cy="39.5" r="6" fill="#7EF0D0"/><circle cx="60" cy="39.5" r="6" fill="#7EF0D0"/><path d="M38 60 Q50 69 62 60" fill="none" stroke="#1E78C8" stroke-width="3.5" stroke-linecap="round"/><rect x="38" y="74" width="24" height="8" fill="#1E78C8"/><rect x="24" y="81" width="52" height="19" rx="8" fill="#7FDCFF" stroke="#1E78C8" stroke-width="3"/><circle cx="50" cy="91" r="4" fill="#FF2E6E"/></svg>',
+dragon:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-dragon" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#D7B0FF"/><stop offset="1" stop-color="#9B5DE5"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-dragon)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><path d="M24 52 L2 30 L9 58 L2 72 L26 68Z" fill="#FF9F1C"/><path d="M76 52 L98 30 L91 58 L98 72 L74 68Z" fill="#FF9F1C"/><path d="M34 30 L29 9 L45 25Z M66 30 L71 9 L55 25Z" fill="#FFF1C9"/><path d="M45 26 L50 12 L55 26Z" fill="#F5B700"/><circle cx="50" cy="56" r="31" fill="#35C96B"/><ellipse cx="50" cy="71" rx="17" ry="12" fill="#A8F5B5"/><circle cx="45" cy="68" r="1.9" fill="#2F6B49"/><circle cx="55" cy="68" r="1.9" fill="#2F6B49"/><circle cx="38" cy="49" r="8" fill="#fff"/><circle cx="62" cy="49" r="8" fill="#fff"/><circle cx="39" cy="50" r="4" fill="#2B2B4A"/><circle cx="40.6" cy="48.2" r="1.4" fill="#fff"/><circle cx="61" cy="50" r="4" fill="#2B2B4A"/><circle cx="62.6" cy="48.2" r="1.4" fill="#fff"/><path d="M41 76 Q50 83 59 76" fill="none" stroke="#2F6B49" stroke-width="2.6" stroke-linecap="round"/></svg>',
+fox:'<svg class="art" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg-fox" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#B6F08A"/><stop offset="1" stop-color="#4FBF4A"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg-fox)"/><g fill="#fff" opacity=".85"><circle cx="14" cy="26" r="3"/><circle cx="88" cy="20" r="2.4"/><circle cx="90" cy="76" r="3"/><circle cx="10" cy="72" r="2.2"/></g><path d="M20 40 L20 5 L46 26Z M80 40 L80 5 L54 26Z" fill="#FF7A1A"/><path d="M25 32 L25 15 L38 26Z M75 32 L75 15 L62 26Z" fill="#FFD9C2"/><path d="M16 46 Q50 18 84 46 Q78 78 50 93 Q22 78 16 46Z" fill="#FF7A1A"/><path d="M16 47 Q38 56 50 93 Q22 78 16 47Z M84 47 Q62 56 50 93 Q78 78 84 47Z" fill="#FFF4E6"/><ellipse cx="50" cy="86" rx="5.5" ry="4.2" fill="#3A2A2A"/><circle cx="38" cy="54" r="4.6" fill="#2B2B4A"/><circle cx="39.6" cy="52.2" r="1.6" fill="#fff"/><circle cx="62" cy="54" r="4.6" fill="#2B2B4A"/><circle cx="63.6" cy="52.2" r="1.6" fill="#fff"/></svg>'};
+
+var T={
+ ru:{title:'AZIMA. Путешествие в мир занимательной математики',by:'Автор программы: ',other:'kk',btn:'Қазақша',cover:'Обложка',aria:'Переключить язык на казахский'},
+ kk:{title:'AZIMA. Қызықты математика әлеміне саяхат. Демо нұсқа',by:'Бағдарлама авторы: ',other:'ru',btn:'Русский',cover:'Мұқаба',aria:'Тілді орыс тіліне ауыстыру'}
+};
+function fresh(){
+  /* новый контейнер: прежняя версия приложения остаётся привязанной к старому и больше не влияет на экран */
+  var old=document.getElementById('app'),n=document.createElement('main');n.id='app';
+  old.parentNode.replaceChild(n,old);
+  try{speechSynthesis.cancel();}catch(e){}
+  return n;
+}
+function foot(lang){
+  var f=document.getElementById('foot');f.innerHTML='';f.hidden=!lang;
+  if(!lang)return;
+  var s=document.createElement('span');s.textContent=T[lang].by+AUTHOR;f.appendChild(s);
+  var g=document.createElement('span');g.className='row';f.appendChild(g);
+  var pb=document.createElement('button');pb.className='btn plain';pb.textContent='🎓 '+PT[lang].prof;
+  pb.addEventListener('click',function(){showProfile(lang);});g.appendChild(pb);
+  var c=document.createElement('button');c.className='btn plain';c.textContent='📖 '+T[lang].cover;
+  c.addEventListener('click',choose);g.appendChild(c);
+}
+var PK='azima-demo-profile',SKEY={ru:'azima-demo-none',kk:'azima-demo-kk'};
+var PT={
+ ru:{h:'Профиль ученика-отличника',name:'Имя',school:'Номер или название школы',save:'Сохранить',go:'Начать заниматься',edit:'Изменить профиль',
+  res:'Успеваемость',total:'Всего баллов',solved:'Решено задач',avg:'Средний балл за задачу',cols:['Раздел','Решено','Баллы'],sect:['Темы','Задачник','Клуб'],of:' из ',
+  lev:['Отличник! Так держать.','Хороший результат. Попробуй решать чуть быстрее.','Начало положено. Каждая задача приносит баллы.'],none:'Баллов пока нет. Реши первую задачу!',
+  rule:'За каждую задачу можно получить от 1 до 3 баллов: чем быстрее верный ответ, тем больше баллов. Трудным задачам даётся больше времени. Каждая ошибка снимает один балл, но меньше 1 балла не бывает.',
+  sch:'Школа: ',prof:'Профиль',intro:'Запиши, как тебя зовут и в какой школе ты учишься.',other:'На казахском языке набрано баллов: '},
+ kk:{h:'Үздік оқушының профилі',name:'Аты',school:'Мектептің нөмірі немесе атауы',save:'Сақтау',go:'Сабақты бастау',edit:'Профильді өзгерту',
+  res:'Үлгерімі',total:'Барлық ұпай',solved:'Шығарылған есептер',avg:'Бір есепке орташа ұпай',cols:['Бөлім','Шығарылғаны','Ұпай'],sect:['Тақырыптар','Есептер жинағы','Клуб'],of:' / ',
+  lev:['Үздік! Осылай жалғастыр.','Жақсы нәтиже. Сәл жылдамырақ шығарып көр.','Бастамасы жақсы. Әр есеп ұпай әкеледі.'],none:'Әзірге ұпай жоқ. Бірінші есепті шығар!',
+  rule:'Әр есеп үшін 1-ден 3-ке дейін ұпай алуға болады: дұрыс жауап неғұрлым тез берілсе, ұпай соғұрлым көп. Қиын есептерге көбірек уақыт беріледі. Әр қате бір ұпайды кемітеді, бірақ 1 ұпайдан кем болмайды.',
+  sch:'Мектеп: ',prof:'Профиль',intro:'Атыңды және қай мектепте оқитыныңды жаз.',other:'Орыс тілінде жиналған ұпай: '}
+};
+var MAXN=[50,0,15];
+function esc(v){return String(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function getProfile(){try{var p=JSON.parse(localStorage.getItem(PK)||'null');if(p&&p.name)return p;}catch(e){}return null;}
+function tally(lang){
+  /* считает решённые задачи и баллы по трём разделам: темы, задачник, клуб */
+  var r=[[0,0],[0,0],[0,0]],d=null;
+  try{d=JSON.parse(localStorage.getItem(SKEY[lang])||'null');}catch(e){}
+  if(!d)return r;
+  function add(i,o){Object.keys(o||{}).forEach(function(k){var v=+o[k]||0;if(v>0){r[i][0]++;r[i][1]+=Math.min(3,v);}});}
+  Object.keys(d.done||{}).forEach(function(k){add(0,d.done[k]);});
+  add(1,d.book);
+  Object.keys(d.club||{}).forEach(function(k){add(2,d.club[k]);});
+  return r;
+}
+function showProfile(lang,editing){
+  var a=fresh(),L=PT[lang],p=getProfile();foot(lang);
+  if(!p||editing){
+    a.innerHTML='<h2>'+L.h+'</h2><p>'+L.intro+'</p>'+
+      '<div class="field"><label for="pn">'+L.name+'</label><input id="pn" maxlength="30" autocomplete="off" value="'+esc(p?p.name:'')+'"></div>'+
+      '<div class="field"><label for="ps">'+L.school+'</label><input id="ps" maxlength="50" autocomplete="off" value="'+esc(p?p.school||'':'')+'"></div>'+
+      '<p><button class="btn main" id="psave">'+L.save+'</button></p>';
+    var pn=document.getElementById('pn'),ps=document.getElementById('ps'),sv=document.getElementById('psave');
+    sv.disabled=!pn.value.trim();
+    pn.addEventListener('input',function(){sv.disabled=!pn.value.trim();});
+    sv.addEventListener('click',function(){
+      var name=pn.value.trim();if(!name)return;
+      try{localStorage.setItem(PK,JSON.stringify({name:name,school:ps.value.trim()}));}catch(e){}
+      PROFILE={name:name,school:ps.value.trim()};showProfile(lang);
+    });
+    window.scrollTo(0,0);return;
+  }
+  var r=tally(lang),n=r[0][0]+r[1][0]+r[2][0],pts=r[0][1]+r[1][1]+r[2][1],avg=n?pts/n:0;
+  var o=tally(lang==='ru'?'kk':'ru'),op=o[0][1]+o[1][1]+o[2][1];
+  var lev=!n?L.none:avg>=2.5?L.lev[0]:avg>=1.8?L.lev[1]:L.lev[2];
+  var h='<h2>'+L.h+'</h2><div class="card"><div class="pname">🎓 '+esc(p.name)+'</div>'+(p.school?'<div>'+L.sch+esc(p.school)+'</div>':'')+'</div>'+
+    '<p class="sect" style="margin-top:1.2rem">'+L.res+'</p>'+
+    '<div class="stats"><div><b>'+pts+'</b><span>'+L.total+'</span></div><div><b>'+n+'</b><span>'+L.solved+'</span></div><div><b>'+(n?avg.toFixed(1).replace('.',','):'—')+'</b><span>'+L.avg+'</span></div></div>'+
+    '<p class="lev">'+lev+'</p>'+
+    '<div class="tw"><table><thead><tr><th>'+L.cols[0]+'</th><th>'+L.cols[1]+'</th><th>'+L.cols[2]+'</th></tr></thead><tbody>';
+  r.forEach(function(x,i){if(!MAXN[i])return;h+='<tr><td>'+L.sect[i]+'</td><td>'+x[0]+L.of+MAXN[i]+'</td><td>'+x[1]+L.of+MAXN[i]*3+'</td></tr>';});
+  h+='</tbody></table></div>'+(op?'<p>'+L.other+op+'</p>':'')+'<p class="rule">'+L.rule+'</p>'+
+    '<div class="row"><button class="btn main" id="pgo">'+L.go+'</button><button class="btn plain" id="pedit">'+L.edit+'</button></div>';
+  a.innerHTML=h;
+  document.getElementById('pgo').addEventListener('click',function(){startApp(lang);});
+  document.getElementById('pedit').addEventListener('click',function(){showProfile(lang,true);});
+  window.scrollTo(0,0);
+}
+var PROFILE=null;
+function startApp(lang){
+  fresh();foot(lang);
+  if(lang==='kk')startKk();else startRu();
+  window.scrollTo(0,0);
+}
+function run(lang){
+  try{localStorage.setItem(LK,lang);}catch(e){}
+  document.documentElement.lang=lang;document.title=T[lang].title;
+  showProfile(lang);
+}
+function playDigits(box){
+  /* маленькие цифры на фоне обложки: летают, отскакивают от краёв и друг от друга */
+  var colors=['#FF4F79','#FF9F1C','#F2B400','#34C36A','#3DA5FF','#9B5DE5'],items=[],i,j;
+  var still=false;try{still=window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  var W=box.clientWidth||600,H=box.clientHeight||500;
+  for(i=0;i<12;i++){
+    var el=document.createElement('span'),size=40+Math.random()*30,ang=Math.random()*6.283,sp=.5+Math.random()*.7;
+    el.className='dg';el.textContent=String(i%10);el.style.color=colors[i%colors.length];el.style.fontSize=size+'px';
+    el.appendChild(document.createElement('i'));box.appendChild(el);
+    items.push({el:el,r:size*.42,x:size+Math.random()*Math.max(1,W-2*size),y:size+Math.random()*Math.max(1,H-2*size),vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,ph:Math.random()*6.283,hop:0});
+  }
+  function draw(t){
+    items.forEach(function(d){
+      var sc=1+d.hop*.35;
+      d.el.style.transform='translate('+(d.x-d.r).toFixed(1)+'px,'+(d.y-d.r).toFixed(1)+'px) rotate('+(Math.sin(t/500+d.ph)*10).toFixed(1)+'deg) scale('+sc.toFixed(2)+')';
+    });
+  }
+  draw(0);
+  if(still)return;
+  var last=0;
+  function step(t){
+    if(!box.isConnected)return;
+    var dt=Math.min(3,last?(t-last)/16.7:1);last=t;W=box.clientWidth;H=box.clientHeight;
+    for(i=0;i<items.length;i++){
+      var d=items[i];d.x+=d.vx*dt;d.y+=d.vy*dt;d.hop*=.9;
+      if(d.x<d.r){d.x=d.r;d.vx=Math.abs(d.vx);}else if(d.x>W-d.r){d.x=W-d.r;d.vx=-Math.abs(d.vx);}
+      if(d.y<d.r){d.y=d.r;d.vy=Math.abs(d.vy);}else if(d.y>H-d.r){d.y=H-d.r;d.vy=-Math.abs(d.vy);}
+    }
+    for(i=0;i<items.length;i++)for(j=i+1;j<items.length;j++){
+      var p=items[i],q=items[j],dx=q.x-p.x,dy=q.y-p.y,dist=Math.sqrt(dx*dx+dy*dy),min=p.r+q.r;
+      if(dist>0&&dist<min){
+        var nx=dx/dist,ny=dy/dist,rel=(p.vx-q.vx)*nx+(p.vy-q.vy)*ny,push=(min-dist)/2;
+        p.x-=nx*push;p.y-=ny*push;q.x+=nx*push;q.y+=ny*push;
+        if(rel>0){p.vx-=rel*nx;p.vy-=rel*ny;q.vx+=rel*nx;q.vy+=rel*ny;p.hop=1;q.hop=1;}
+      }
+    }
+    draw(t);
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function choose(){
+  var a=fresh();document.documentElement.lang='kk';document.title='AZIMA. Демо нұсқа';
+  var who='';Object.keys(ART).forEach(function(k){who+=ART[k];});
+  a.innerHTML='<div class="cover"><div class="play" id="play" aria-hidden="true"></div><div class="cover-text">'+
+    '<div class="who" aria-hidden="true">'+who+'</div>'+
+    '<div class="brand">AZIMA</div><h1>Қызықты математика әлеміне саяхат</h1><p class="demo">Демо нұсқа</p>'+
+        '<div class="row"><button class="btn main" data-l="kk">Бастау</button></div>'+
+    '<p class="by">Бағдарлама авторы<br><strong>'+AUTHOR+'</strong></p>'+
+    '</div></div>';
+  a.querySelectorAll('[data-l]').forEach(function(b){b.addEventListener('click',function(){run(b.dataset.l);});});
+  foot(null);
+  playDigits(document.getElementById('play'));
+  window.scrollTo(0,0);
+}
+choose();
+})();
+</script>
+</body>
+</html>
